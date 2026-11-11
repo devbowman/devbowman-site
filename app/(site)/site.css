@@ -109,7 +109,7 @@ img { max-width: 100%; }
 .panel.ohp-panel {
   --paper: var(--ohp-red);
   --ink: var(--ohp-yellow);
-  --mute: color-mix(in srgb, var(--ohp-yellow) 72%, var(--ohp-red));
+  --mute: var(--ohp-yellow); /* yellow on red is low-contrast, so small text stays full strength */
   --frame: var(--ohp-red-lift);
   background: var(--ohp-red);
   color: var(--ohp-yellow);
@@ -147,3 +147,5 @@ img { max-width: 100%; }
   .viewer .big { flex-basis: 100%; }
   .viewer .small { display: none; }
 }
+
+.ohp-panel .cover-label, .ohp-panel .ohp-intro span { font-weight: 500; }
