@@ -234,7 +234,7 @@ export default function Site({site, ohp}) {
 
   return (
     <div className="site">
-      <header className={`top${panel === 'about' ? ' on-about' : ''}`}>
+      <header className={`top${panel === 'about' ? ' on-about' : ''}${panel === 'ohp' ? ' on-ohp' : ''}`}>
         <nav className="pill" aria-label="Sections" ref={pill}>
           <span className="knob" style={{width: knob.w, transform: `translateX(${knob.x - 2}px)`}} />
           {ORDER.map((k) => (
@@ -311,7 +311,7 @@ export default function Site({site, ohp}) {
           {view?.list === 'index' && <Viewer current={current} view={view} next={next} step={step} />}
         </section>
 
-        <section className={`panel${view?.list === 'ohp' ? ' locked' : ''}`} aria-label="ONE HOUR PHOTO">
+        <section className="panel ohp-panel" aria-label="ONE HOUR PHOTO">
           <div className="wrap">
             {ohp.length ? (
               <>
