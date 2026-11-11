@@ -69,7 +69,8 @@ img { max-width: 100%; }
 @media (max-width: 420px) { .pill button { padding: 4px 10px; } }
 
 /* Sliding panels */
-.strip { display: flex; width: 300%; height: 100%; transition: transform 0.7s var(--ease); }
+.strip { display: flex; width: 300%; height: 100%; transition: transform 0.7s var(--ease); touch-action: pan-y; }
+@media (hover: none) { .strip { transition-duration: 0.45s; } }
 .panel { width: 33.3334%; height: 100%; overflow-y: auto; overscroll-behavior: contain; position: relative; }
 .panel.locked { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .strip, .knob { transition: none; } }

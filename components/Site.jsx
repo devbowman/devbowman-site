@@ -8,7 +8,7 @@ const LABELS = {about: 'Dev Bowman', index: 'Index', ohp: 'ONE HOUR PHOTO'}
 // Shown until a bio is written in the Studio (Site settings).
 const FALLBACK_BIO = [
   'Dev Bowman is a photographer, writer, and editor based in Brooklyn, New York.',
-  'My work has been published in Interview, Nylon, PAPER, Rolling Stone, The Cut, Vanity Fair, InStyle, Forbes and more.',
+  'His work has been published in Interview, Nylon, PAPER, Rolling Stone, The Cut, Vanity Fair, InStyle, Forbes and more.',
 ]
 const FALLBACK_EMAIL = 'dev@onehour.photo'
 const FALLBACK_LINKS = [{label: '@dev.baby', url: 'https://www.instagram.com/dev.baby/'}]
@@ -180,6 +180,43 @@ export default function Site({site, ohp}) {
     setView({list, p, i})
   }
 
+  // Swipe between panels on touch screens: the strip follows the finger, then snaps.
+  const strip = useRef(null)
+  const drag = useRef(null)
+  const offset = (i, px = 0) => `translateX(calc(${-i * 33.3334}% + ${px}px))`
+  const onTouchStart = (e) => {
+    if (view || e.touches.length !== 1) return
+    const t = e.touches[0]
+    drag.current = {x: t.clientX, y: t.clientY, t: Date.now(), dx: 0, axis: null}
+  }
+  const onTouchMove = (e) => {
+    const d = drag.current
+    if (!d) return
+    const t = e.touches[0]
+    const dx = t.clientX - d.x
+    const dy = t.clientY - d.y
+    if (!d.axis && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) d.axis = Math.abs(dx) > Math.abs(dy) * 1.2 ? 'x' : 'y'
+    if (d.axis !== 'x') return
+    const i = ORDER.indexOf(panel)
+    const atEdge = (i === 0 && dx > 0) || (i === ORDER.length - 1 && dx < 0)
+    d.dx = atEdge ? dx * 0.3 : dx
+    strip.current.style.transition = 'none'
+    strip.current.style.transform = offset(i, d.dx)
+  }
+  const onTouchEnd = () => {
+    const d = drag.current
+    drag.current = null
+    if (!d || d.axis !== 'x') return
+    const i = ORDER.indexOf(panel)
+    const speed = Math.abs(d.dx) / Math.max(1, Date.now() - d.t)
+    const far = Math.abs(d.dx) > window.innerWidth * 0.18 || (Math.abs(d.dx) > 30 && speed > 0.4)
+    let j = i
+    if (far) j = Math.min(ORDER.length - 1, Math.max(0, i + (d.dx < 0 ? 1 : -1)))
+    strip.current.style.transition = ''
+    strip.current.style.transform = offset(j)
+    if (j !== i) go(ORDER[j], true)
+  }
+
   const current = view ? lists[view.list][view.p] : null
   const next = current ? current.frames[(view.i + 1) % current.frames.length] : null
   const email = site.email || FALLBACK_EMAIL
@@ -226,7 +263,15 @@ export default function Site({site, ohp}) {
         </div>
       </header>
 
-      <main className="strip" style={{transform: `translateX(${-ORDER.indexOf(panel) * 33.3334}%)`}}>
+      <main
+        className="strip"
+        ref={strip}
+        style={{transform: offset(ORDER.indexOf(panel))}}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchEnd}
+      >
         <section className="panel about-panel" aria-label="About">
           <div className="about">
             <div className="stack">
