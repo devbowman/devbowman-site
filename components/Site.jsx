@@ -8,12 +8,10 @@ const LABELS = {about: 'Dev Bowman', index: 'Index', ohp: 'ONE HOUR PHOTO'}
 // Shown until a bio is written in the Studio (Site settings).
 const FALLBACK_BIO = [
   'Dev Bowman is a photographer, writer, and editor based in Brooklyn, New York.',
-  'His work has appeared in Vogue, Rolling Stone, Vanity Fair, The Cut, Interview, PAPER, Nylon, InStyle, Forbes, and Deadline. In December 2025 he started ONE HOUR PHOTO, a weekly film portrait and interview series on comedy, drag, and culture.',
+  'My work has been published in Interview, Nylon, PAPER, Rolling Stone, The Cut, Vanity Fair, InStyle, Forbes and more.',
 ]
-const FALLBACK_LINKS = [
-  {label: '@oonehourphotoo', url: 'https://www.instagram.com/oonehourphotoo/'},
-  {label: 'onehour.photo', url: 'https://www.onehour.photo'},
-]
+const FALLBACK_EMAIL = 'dev@onehour.photo'
+const FALLBACK_LINKS = [{label: '@dev.baby', url: 'https://www.instagram.com/dev.baby/'}]
 
 function hash(s) {
   let h = 2166136261
@@ -81,25 +79,30 @@ function Grid({projects, offset, onHover, onOpen}) {
   return <div className="grid">{cells}</div>
 }
 
-// ONE HOUR PHOTO: one large portrait per feature, name underneath.
-function Covers({projects, onHover, onOpen}) {
+// ONE HOUR PHOTO: one large portrait per feature. Hover shows the feature title; click opens it on Substack.
+function Covers({projects, onHover}) {
   return (
     <div className="covers">
-      {projects.map((p, pi) => (
-        <button
+      {projects.map((p) => (
+        <a
           key={p.key}
           className="cover"
-          aria-label={`${p.title}, ${p.frames.length} photos`}
-          onMouseEnter={() => onHover(p.short)}
-          onFocus={() => onHover(p.short)}
+          href={p.link}
+          target="_blank"
+          rel="noopener"
+          onMouseEnter={() => onHover(p.title)}
+          onFocus={() => onHover(p.title)}
           onMouseLeave={() => onHover('')}
-          onClick={() => onOpen(pi, 0)}
+          onBlur={() => onHover('')}
         >
           <span className="tile">
             <Thumb frame={p.frames[0]} />
           </span>
-          <span className="cover-name">{p.short}</span>
-        </button>
+          <span className="cover-label">
+            <span className="cover-name">{p.short}</span>
+            <span className="cover-title">{p.title} ↗</span>
+          </span>
+        </a>
       ))}
     </div>
   )
@@ -179,7 +182,7 @@ export default function Site({site, ohp}) {
 
   const current = view ? lists[view.list][view.p] : null
   const next = current ? current.frames[(view.i + 1) % current.frames.length] : null
-  const email = site.email
+  const email = site.email || FALLBACK_EMAIL
   const links = site.links?.length ? site.links : FALLBACK_LINKS
 
   const copy = async () => {
@@ -266,7 +269,15 @@ export default function Site({site, ohp}) {
         <section className={`panel${view?.list === 'ohp' ? ' locked' : ''}`} aria-label="ONE HOUR PHOTO">
           <div className="wrap">
             {ohp.length ? (
-              <Covers projects={ohp} onHover={setHover} onOpen={open('ohp')} />
+              <>
+                <p className="ohp-intro">
+                  <a href="https://www.onehour.photo" target="_blank" rel="noopener">
+                    ONE HOUR PHOTO
+                  </a>
+                  <span>Portraits and interviews, all on film.</span>
+                </p>
+                <Covers projects={ohp} onHover={setHover} />
+              </>
             ) : (
               <p className="empty">
                 Read ONE HOUR PHOTO at <a href="https://www.onehour.photo">onehour.photo</a>.
