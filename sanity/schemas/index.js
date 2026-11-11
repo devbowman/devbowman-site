@@ -1,4 +1,6 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {FeatureInput} from '../components/FeatureInput'
+import {PhotoInput} from '../components/PhotoInput'
 
 export const project = defineType({
   name: 'project',
@@ -88,4 +90,53 @@ export const siteSettings = defineType({
   preview: {prepare: () => ({title: 'Site settings'})},
 })
 
-export const schemaTypes = [project, siteSettings]
+export const ohpCover = defineType({
+  name: 'ohpCover',
+  title: 'Feature cover',
+  type: 'document',
+  fields: [
+    defineField({
+      name: 'feature',
+      title: 'Feature',
+      type: 'string',
+      components: {input: FeatureInput},
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: 'photo',
+      title: 'Cover photo',
+      type: 'number',
+      components: {input: PhotoInput},
+      initialValue: 1,
+    }),
+    defineField({
+      name: 'name',
+      title: 'Name on the site',
+      type: 'string',
+      description: 'Optional. Replaces the name shown under the cover, e.g. "Nico Carney".',
+    }),
+    defineField({
+      name: 'image',
+      title: 'Upload a different cover',
+      type: 'image',
+      options: {hotspot: true},
+      description: 'Optional. Use an image that isn’t in the Substack post. This wins over the photo picked above.',
+    }),
+    defineField({
+      name: 'hidden',
+      title: 'Hide this feature on the site',
+      type: 'boolean',
+      initialValue: false,
+    }),
+  ],
+  preview: {
+    select: {feature: 'feature', name: 'name', hidden: 'hidden', photo: 'photo', media: 'image'},
+    prepare: ({feature, name, hidden, photo, media}) => ({
+      title: name || (feature || '').replace(/^.*\/p\//, '').replace(/-/g, ' ') || 'New cover',
+      subtitle: hidden ? 'Hidden' : media ? 'Custom upload' : `Photo ${photo || 1}`,
+      media,
+    }),
+  },
+})
+
+export const schemaTypes = [project, siteSettings, ohpCover]
