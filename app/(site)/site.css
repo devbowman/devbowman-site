@@ -94,6 +94,17 @@ img { max-width: 100%; }
 .grid:hover .tile { opacity: 0.55; }
 .grid .tile:hover, .grid .tile:focus-visible { opacity: 1; }
 @media (hover: none) { .grid:hover .tile { opacity: 1; } }
+/* ONE HOUR PHOTO covers: one portrait per feature */
+.covers { display: grid; gap: 28px 10px; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); max-width: 112rem; margin: 0 auto; }
+@media (min-width: 1100px) { .covers { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 560px) { .covers { grid-template-columns: repeat(2, 1fr); gap: 20px 8px; } }
+.cover { display: flex; flex-direction: column; gap: 8px; text-align: left; min-width: 0; }
+.cover .tile { aspect-ratio: 4 / 5; height: auto; }
+.cover-name { font-family: var(--mono); font-size: 11px; color: var(--mute); transition: color 0.25s; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.covers:hover .tile { opacity: 0.55; }
+.cover:hover .tile, .cover:focus-visible .tile { opacity: 1; }
+.cover:hover .cover-name, .cover:focus-visible .cover-name { color: var(--ink); }
+@media (hover: none) { .covers:hover .tile { opacity: 1; } }
 .empty { text-align: center; color: var(--mute); padding-top: 30vh; }
 
 /* Viewer */

@@ -81,6 +81,30 @@ function Grid({projects, offset, onHover, onOpen}) {
   return <div className="grid">{cells}</div>
 }
 
+// ONE HOUR PHOTO: one large portrait per feature, name underneath.
+function Covers({projects, onHover, onOpen}) {
+  return (
+    <div className="covers">
+      {projects.map((p, pi) => (
+        <button
+          key={p.key}
+          className="cover"
+          aria-label={`${p.title}, ${p.frames.length} photos`}
+          onMouseEnter={() => onHover(p.short)}
+          onFocus={() => onHover(p.short)}
+          onMouseLeave={() => onHover('')}
+          onClick={() => onOpen(pi, 0)}
+        >
+          <span className="tile">
+            <Thumb frame={p.frames[0]} />
+          </span>
+          <span className="cover-name">{p.short}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export default function Site({site, ohp}) {
   const [panel, setPanel] = useState('index')
   const [hover, setHover] = useState('')
@@ -242,7 +266,7 @@ export default function Site({site, ohp}) {
         <section className={`panel${view?.list === 'ohp' ? ' locked' : ''}`} aria-label="ONE HOUR PHOTO">
           <div className="wrap">
             {ohp.length ? (
-              <Grid projects={ohp} offset={0} onHover={setHover} onOpen={open('ohp')} />
+              <Covers projects={ohp} onHover={setHover} onOpen={open('ohp')} />
             ) : (
               <p className="empty">
                 Read ONE HOUR PHOTO at <a href="https://www.onehour.photo">onehour.photo</a>.
