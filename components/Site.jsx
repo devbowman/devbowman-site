@@ -117,7 +117,13 @@ export default function Site({site, ohp}) {
   const pill = useRef(null)
   const [knob, setKnob] = useState({x: 0, w: 0})
   const [filter, setFilter] = useState('all')
-  const selects = filter === 'all' ? site.projects : site.projects.filter((p) => p.cats.includes(filter))
+  // Filtering keeps only the photos with that tag (projects with none drop out).
+  const selects =
+    filter === 'all'
+      ? site.projects
+      : site.projects
+          .map((p) => ({...p, frames: p.frames.filter((f) => f.tags.includes(filter))}))
+          .filter((p) => p.frames.length)
   const lists = {selects, ohp}
 
   const go = useCallback((name, push) => {
@@ -307,7 +313,7 @@ export default function Site({site, ohp}) {
         <section className={`panel${view?.list === 'selects' ? ' locked' : ''}`} aria-label="Selects">
           <div className="wrap">
             {site.categories.length > 0 && (
-              <nav className="filters" aria-label="Filter by category">
+              <nav className="filters" aria-label="Filter by tag">
                 {[{id: 'all', title: 'All'}, ...site.categories].map((c) => (
                   <button
                     key={c.id}

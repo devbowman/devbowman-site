@@ -1,6 +1,7 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {FeatureInput} from '../components/FeatureInput'
 import {PhotoInput} from '../components/PhotoInput'
+import {ImagesWithBulkTags} from '../components/ImagesWithBulkTags'
 
 export const project = defineType({
   name: 'project',
@@ -11,7 +12,7 @@ export const project = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      description: 'Shown when someone hovers the project in the Index, e.g. "Rolling Stone" or "Nike".',
+      description: 'Shown when someone hovers the project in Selects, e.g. "Rolling Stone" or "Nike".',
       validation: (r) => r.required(),
     }),
     defineField({
@@ -19,23 +20,26 @@ export const project = defineType({
       title: 'Images',
       type: 'array',
       description:
-        'Drag to reorder. Thumbnails crop to 4:5. Click an image and set the hotspot to choose what stays in frame.',
+        'Drag several files in at once. Drag to reorder. Click an image to tag it on its own or set the hotspot (what stays in frame when cropped to 4:5).',
+      components: {input: ImagesWithBulkTags},
+      options: {layout: 'grid'},
       of: [
         defineArrayMember({
           type: 'image',
           options: {hotspot: true},
-          fields: [defineField({name: 'alt', title: 'Description (for screen readers)', type: 'string'})],
+          fields: [
+            defineField({
+              name: 'tags',
+              title: 'Tags',
+              type: 'array',
+              description: 'Used by the filter on Selects.',
+              of: [defineArrayMember({type: 'reference', to: [{type: 'category'}]})],
+            }),
+            defineField({name: 'alt', title: 'Description (for screen readers)', type: 'string'}),
+          ],
         }),
       ],
       validation: (r) => r.required().min(1),
-    }),
-    defineField({
-      name: 'categories',
-      title: 'Categories',
-      type: 'array',
-      description: 'Used by the filter on Selects. A project can be in more than one.',
-      of: [defineArrayMember({type: 'reference', to: [{type: 'category'}]})],
-      options: {layout: 'tags'},
     }),
     defineField({
       name: 'info',
@@ -149,7 +153,7 @@ export const ohpCover = defineType({
 
 export const category = defineType({
   name: 'category',
-  title: 'Category',
+  title: 'Tag',
   type: 'document',
   fields: [
     defineField({name: 'title', title: 'Name', type: 'string', validation: (r) => r.required()}),

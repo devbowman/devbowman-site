@@ -8,6 +8,6 @@ export const structure = (S) =>
         .child(S.document().schemaType('siteSettings').documentId('siteSettings').title('Site settings')),
       S.divider(),
       S.documentTypeListItem('project').title('Projects'),
-      S.documentTypeListItem('category').title('Categories'),
+      S.documentTypeListItem('category').title('Tags'),
       S.documentTypeListItem('ohpCover').title('ONE HOUR PHOTO covers'),
     ])
