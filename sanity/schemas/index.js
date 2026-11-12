@@ -92,10 +92,10 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: 'indexOrder',
-      title: 'Index order',
+      title: 'Selects order',
       type: 'array',
       description:
-        'Drag projects into the order they appear in the Index. Projects not listed here show after these, newest first.',
+        'Drag projects into the order they appear on Selects (top of the list = top of the page). Projects not added here show after these, newest first.',
       of: [defineArrayMember({type: 'reference', to: [{type: 'project'}]})],
     }),
   ],
