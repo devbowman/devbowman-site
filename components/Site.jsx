@@ -335,12 +335,10 @@ export default function Site({site, ohp}) {
           <div className="wrap">
             {ohp.length ? (
               <>
-                <p className="ohp-intro">
-                  <a href="https://www.onehour.photo" target="_blank" rel="noopener">
-                    ONE HOUR PHOTO
-                  </a>
-                  <span>Portraits and interviews, all on film.</span>
-                </p>
+                <a className="ohp-intro" href="https://www.onehour.photo" target="_blank" rel="noopener">
+                  <strong>ONE HOUR PHOTO</strong>
+                  <span>My weekly Substack featuring portraits and interviews, all shot on film. ↗</span>
+                </a>
                 <Covers projects={ohp} onHover={setHover} />
               </>
             ) : (

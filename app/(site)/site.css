@@ -136,8 +136,10 @@ img { max-width: 100%; }
 .cover:hover .cover-name, .cover:focus-visible .cover-name { opacity: 0; }
 .cover:hover .cover-title, .cover:focus-visible .cover-title { opacity: 1; }
 .ohp-intro { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; margin: 0 auto 2.4rem !important; }
-.ohp-intro a { font-weight: 500; letter-spacing: 0.04em; text-decoration: none; }
-.ohp-intro span { color: var(--mute); }
+.site a.ohp-intro { width: fit-content; text-decoration: none; }
+.ohp-intro strong { font-weight: 500; letter-spacing: 0.04em; }
+.ohp-intro span { color: var(--mute); text-wrap: balance; }
+.ohp-intro:hover span, .ohp-intro:focus-visible span { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 @media (hover: none) { .covers:hover .tile { opacity: 1; } }
 .empty { text-align: center; color: var(--mute); padding-top: 30vh; }
 
