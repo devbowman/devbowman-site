@@ -1,6 +1,6 @@
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {Badge, Box, Button, Card, Checkbox, Flex, Grid, Select, Stack, Text, TextInput} from '@sanity/ui'
-import {set, useClient} from 'sanity'
+import {insert, set, setIfMissing, useClient} from 'sanity'
 
 const TAGS = `*[_type == "category" && !(_id in path("drafts.**"))] | order(coalesce(order, 999) asc, title asc){_id, title}`
 const key = () => Math.random().toString(36).slice(2, 12)
@@ -16,6 +16,36 @@ export function ImagesWithBulkTags(props) {
   const [newName, setNewName] = useState('')
   const [busy, setBusy] = useState(false)
   const [note, setNote] = useState('')
+  const [upload, setUpload] = useState(null) // {done, total}
+  const [dragOver, setDragOver] = useState(false)
+  const fileInput = useRef(null)
+
+  // Upload many photos at once and append them to the project, in the order picked.
+  const uploadFiles = async (fileList) => {
+    const files = [...(fileList || [])].filter((f) => f.type.startsWith('image/'))
+    if (!files.length || readOnly) return
+    setNote('')
+    setUpload({done: 0, total: files.length})
+    let failed = 0
+    for (let i = 0; i < files.length; i++) {
+      try {
+        const asset = await client.assets.upload('image', files[i], {filename: files[i].name})
+        onChange([
+          setIfMissing([]),
+          insert([{_type: 'image', _key: key(), asset: {_type: 'reference', _ref: asset._id}}], 'after', [-1]),
+        ])
+      } catch (e) {
+        failed++
+      }
+      setUpload({done: i + 1, total: files.length})
+    }
+    setUpload(null)
+    setNote(
+      failed
+        ? `Uploaded ${files.length - failed} of ${files.length}. ${failed} failed; try those again.`
+        : `Uploaded ${files.length} photo${files.length === 1 ? '' : 's'}. Tag them below, then Publish.`,
+    )
+  }
 
   const loadTags = useCallback(() => client.fetch(TAGS).then(setTags).catch(() => {}), [client])
   useEffect(() => {
@@ -89,6 +119,56 @@ export function ImagesWithBulkTags(props) {
 
   return (
     <Stack space={4}>
+      <Card
+        padding={4}
+        radius={2}
+        border
+        tone={dragOver ? 'primary' : 'transparent'}
+        style={{borderStyle: 'dashed', textAlign: 'center'}}
+        onDragOver={(e) => {
+          if ([...e.dataTransfer.types].includes('Files')) {
+            e.preventDefault()
+            e.stopPropagation()
+            setDragOver(true)
+          }
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          if (!e.dataTransfer.files?.length) return
+          e.preventDefault()
+          e.stopPropagation()
+          setDragOver(false)
+          uploadFiles(e.dataTransfer.files)
+        }}
+      >
+        <Stack space={3}>
+          <Text size={1} weight="medium">
+            {upload ? `Uploading ${Math.min(upload.done + 1, upload.total)} of ${upload.total}…` : 'Drop photos here to upload'}
+          </Text>
+          {!upload && (
+            <Flex justify="center">
+              <Button
+                fontSize={1}
+                mode="ghost"
+                text="Choose photos…"
+                disabled={readOnly}
+                onClick={() => fileInput.current?.click()}
+              />
+            </Flex>
+          )}
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+            onChange={(e) => {
+              uploadFiles(e.currentTarget.files)
+              e.currentTarget.value = ''
+            }}
+          />
+        </Stack>
+      </Card>
       {value.length > 0 && (
         <Card padding={3} radius={2} border tone="transparent">
           <Stack space={3}>
