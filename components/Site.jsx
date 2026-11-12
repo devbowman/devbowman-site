@@ -246,7 +246,7 @@ export default function Site({site, ohp}) {
     <div className="site">
       <header className={`top${panel === 'ohp' ? ' on-ohp' : ''}`}>
         <nav className="pill" aria-label="Sections" ref={pill}>
-          <span className="knob" style={{width: knob.w, transform: `translateX(${knob.x - 2}px)`}} />
+          <span className="knob" style={{width: knob.w, transform: `translateX(${knob.x}px)`}} />
           {ORDER.map((k) => (
             <button key={k} data-go={k} aria-current={panel === k ? 'page' : undefined} onClick={() => go(k, true)}>
               {LABELS[k]}
