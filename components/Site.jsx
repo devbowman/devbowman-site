@@ -2,8 +2,9 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react'
 
-const ORDER = ['about', 'index', 'ohp']
-const LABELS = {about: 'Dev Bowman', index: 'Index', ohp: 'ONE HOUR PHOTO'}
+const ORDER = ['about', 'selects', 'ohp']
+const LABELS = {about: 'Dev Bowman', selects: 'Selects', ohp: 'ONE HOUR PHOTO'}
+const ALIASES = {index: 'selects'} // old links keep working
 
 // Shown until a bio is written in the Studio (Site settings).
 const FALLBACK_BIO = [
@@ -109,16 +110,19 @@ function Covers({projects, onHover}) {
 }
 
 export default function Site({site, ohp}) {
-  const [panel, setPanel] = useState('index')
+  const [panel, setPanel] = useState('selects')
   const [hover, setHover] = useState('')
-  const [view, setView] = useState(null) // {list: 'index'|'ohp', p, i}
+  const [view, setView] = useState(null) // {list: 'selects'|'ohp', p, i}
   const [copied, setCopied] = useState('')
   const pill = useRef(null)
   const [knob, setKnob] = useState({x: 0, w: 0})
-  const lists = {index: site.projects, ohp}
+  const [filter, setFilter] = useState('all')
+  const selects = filter === 'all' ? site.projects : site.projects.filter((p) => p.cats.includes(filter))
+  const lists = {selects, ohp}
 
   const go = useCallback((name, push) => {
-    if (!ORDER.includes(name)) name = 'index'
+    name = ALIASES[name] || name
+    if (!ORDER.includes(name)) name = 'selects'
     setView(null)
     setHover('')
     setPanel(name)
@@ -126,7 +130,7 @@ export default function Site({site, ohp}) {
   }, [])
 
   useEffect(() => {
-    go(location.hash.slice(1) || 'index')
+    go(location.hash.slice(1) || 'selects')
     const onHash = () => go(location.hash.slice(1))
     addEventListener('hashchange', onHash)
     return () => removeEventListener('hashchange', onHash)
@@ -162,7 +166,7 @@ export default function Site({site, ohp}) {
         return {...v, p, i}
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [site.projects, ohp],
+    [selects, ohp],
   )
 
   useEffect(() => {
@@ -234,7 +238,7 @@ export default function Site({site, ohp}) {
 
   return (
     <div className="site">
-      <header className={`top${panel === 'about' ? ' on-about' : ''}${panel === 'ohp' ? ' on-ohp' : ''}`}>
+      <header className={`top${panel === 'ohp' ? ' on-ohp' : ''}`}>
         <nav className="pill" aria-label="Sections" ref={pill}>
           <span className="knob" style={{width: knob.w, transform: `translateX(${knob.x - 2}px)`}} />
           {ORDER.map((k) => (
@@ -272,7 +276,7 @@ export default function Site({site, ohp}) {
         onTouchEnd={onTouchEnd}
         onTouchCancel={onTouchEnd}
       >
-        <section className="panel about-panel" aria-label="About">
+        <section className="panel" aria-label="About">
           <div className="about">
             <div className="stack">
               <Bio blocks={site.bio} />
@@ -300,15 +304,31 @@ export default function Site({site, ohp}) {
           </div>
         </section>
 
-        <section className={`panel${view?.list === 'index' ? ' locked' : ''}`} aria-label="Index">
+        <section className={`panel${view?.list === 'selects' ? ' locked' : ''}`} aria-label="Selects">
           <div className="wrap">
+            {site.categories.length > 0 && (
+              <nav className="filters" aria-label="Filter by category">
+                {[{id: 'all', title: 'All'}, ...site.categories].map((c) => (
+                  <button
+                    key={c.id}
+                    aria-pressed={filter === c.id}
+                    onClick={() => {
+                      setView(null)
+                      setFilter(c.id)
+                    }}
+                  >
+                    {c.title}
+                  </button>
+                ))}
+              </nav>
+            )}
             {site.projects.length ? (
-              <Grid projects={site.projects} offset={3} onHover={setHover} onOpen={open('index')} />
+              <Grid key={filter} projects={selects} offset={filter === 'all' ? 3 : 0} onHover={setHover} onOpen={open('selects')} />
             ) : (
               <p className="empty">No projects yet. Add one at dev.pictures/studio.</p>
             )}
           </div>
-          {view?.list === 'index' && <Viewer current={current} view={view} next={next} step={step} />}
+          {view?.list === 'selects' && <Viewer current={current} view={view} next={next} step={step} />}
         </section>
 
         <section className="panel ohp-panel" aria-label="ONE HOUR PHOTO">

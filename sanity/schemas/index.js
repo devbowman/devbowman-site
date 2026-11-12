@@ -30,6 +30,14 @@ export const project = defineType({
       validation: (r) => r.required().min(1),
     }),
     defineField({
+      name: 'categories',
+      title: 'Categories',
+      type: 'array',
+      description: 'Used by the filter on Selects. A project can be in more than one.',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'category'}]})],
+      options: {layout: 'tags'},
+    }),
+    defineField({
       name: 'info',
       title: 'Information',
       type: 'text',
@@ -139,4 +147,21 @@ export const ohpCover = defineType({
   },
 })
 
-export const schemaTypes = [project, siteSettings, ohpCover]
+export const category = defineType({
+  name: 'category',
+  title: 'Category',
+  type: 'document',
+  fields: [
+    defineField({name: 'title', title: 'Name', type: 'string', validation: (r) => r.required()}),
+    defineField({
+      name: 'order',
+      title: 'Position in the filter',
+      type: 'number',
+      description: 'Lower numbers come first.',
+    }),
+  ],
+  orderings: [{title: 'Filter order', name: 'order', by: [{field: 'order', direction: 'asc'}]}],
+  preview: {select: {title: 'title', order: 'order'}, prepare: ({title, order}) => ({title, subtitle: order != null ? `Position ${order}` : undefined})},
+})
+
+export const schemaTypes = [project, siteSettings, ohpCover, category]
