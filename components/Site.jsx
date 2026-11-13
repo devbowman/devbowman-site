@@ -334,7 +334,6 @@ export default function Site({site, ohp}) {
               <p className="empty">No projects yet. Add one at dev.pictures/studio.</p>
             )}
           </div>
-          {view?.list === 'selects' && <Viewer current={current} view={view} next={next} step={step} />}
         </section>
 
         <section className="panel ohp-panel" aria-label="ONE HOUR PHOTO">
@@ -353,9 +352,9 @@ export default function Site({site, ohp}) {
               </p>
             )}
           </div>
-          {view?.list === 'ohp' && <Viewer current={current} view={view} next={next} step={step} />}
         </section>
       </main>
+      {current && <Viewer current={current} view={view} next={next} step={step} />}
     </div>
   )
 }
@@ -363,17 +362,51 @@ export default function Site({site, ohp}) {
 function Viewer({current, view, next, step}) {
   const f = current.frames[view.i]
   const many = current.frames.length > 1
+  const [side, setSide] = useState('next')
+  const touch = useRef(null)
+  const sideOf = (x) => (x < window.innerWidth / 2 ? 'prev' : 'next')
+  // Click or tap the left half to go back, the right half to go forward.
+  const onClick = (e) => step(sideOf(e.clientX) === 'prev' ? -1 : 1)
+  const onTouchStart = (e) => {
+    const t = e.touches[0]
+    touch.current = {x: t.clientX, y: t.clientY}
+  }
+  const onTouchEnd = (e) => {
+    const s = touch.current
+    touch.current = null
+    if (!s) return
+    const t = e.changedTouches[0]
+    const dx = t.clientX - s.x
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(t.clientY - s.y)) {
+      e.preventDefault() // a swipe, not a tap
+      step(dx < 0 ? 1 : -1)
+    }
+  }
   return (
-    <div className="viewer">
-      <button className="frame big" onClick={() => step(1)} aria-label="Next image">
+    <div
+      className={`viewer go-${side}`}
+      onClick={onClick}
+      onMouseMove={(e) => setSide(sideOf(e.clientX))}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      role="dialog"
+      aria-label={`${current.title}, image ${view.i + 1} of ${current.frames.length}`}
+    >
+      <div className="frame big">
         <img src={f.full} alt={f.alt} />
-      </button>
+      </div>
       {many && (
-        <button className="frame small" onClick={() => step(1)} aria-label="Next image">
+        <div className="frame small">
           <img src={next.full} alt={next.alt} />
-        </button>
+        </div>
       )}
       {current.info && <p className="info">{current.info}</p>}
+      <button className="sr-only" onClick={(e) => (e.stopPropagation(), step(-1))}>
+        Previous image
+      </button>
+      <button className="sr-only" onClick={(e) => (e.stopPropagation(), step(1))}>
+        Next image
+      </button>
     </div>
   )
 }
