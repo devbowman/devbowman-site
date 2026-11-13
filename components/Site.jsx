@@ -354,19 +354,28 @@ export default function Site({site, ohp}) {
           </div>
         </section>
       </main>
-      {current && <Viewer current={current} view={view} next={next} step={step} />}
+      {current && <Viewer current={current} view={view} next={next} step={step} close={() => setView(null)} />}
     </div>
   )
 }
 
-function Viewer({current, view, next, step}) {
+function Viewer({current, view, next, step, close}) {
   const f = current.frames[view.i]
   const many = current.frames.length > 1
   const [side, setSide] = useState('next')
   const touch = useRef(null)
-  const sideOf = (x) => (x < window.innerWidth / 2 ? 'prev' : 'next')
-  // Click or tap the left half to go back, the right half to go forward.
-  const onClick = (e) => step(sideOf(e.clientX) === 'prev' ? -1 : 1)
+  const img = useRef(null)
+  // Above or below the photo closes; otherwise the left half goes back, the right half goes forward.
+  const sideOf = (x, y) => {
+    const r = img.current?.getBoundingClientRect()
+    if (r && (y < r.top || y > r.bottom)) return 'close'
+    return x < window.innerWidth / 2 ? 'prev' : 'next'
+  }
+  const onClick = (e) => {
+    const side = sideOf(e.clientX, e.clientY)
+    if (side === 'close') close()
+    else step(side === 'prev' ? -1 : 1)
+  }
   const onTouchStart = (e) => {
     const t = e.touches[0]
     touch.current = {x: t.clientX, y: t.clientY}
@@ -386,14 +395,14 @@ function Viewer({current, view, next, step}) {
     <div
       className={`viewer go-${side}`}
       onClick={onClick}
-      onMouseMove={(e) => setSide(sideOf(e.clientX))}
+      onMouseMove={(e) => setSide(sideOf(e.clientX, e.clientY))}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       role="dialog"
       aria-label={`${current.title}, image ${view.i + 1} of ${current.frames.length}`}
     >
       <div className="frame big">
-        <img src={f.full} alt={f.alt} />
+        <img ref={img} src={f.full} alt={f.alt} />
       </div>
       {many && (
         <div className="frame small">
