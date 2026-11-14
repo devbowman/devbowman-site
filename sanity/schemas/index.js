@@ -89,6 +89,13 @@ export const siteSettings = defineType({
     }),
     defineField({name: 'email', title: 'Contact email', type: 'string'}),
     defineField({
+      name: 'favicon',
+      title: 'Favicon',
+      type: 'image',
+      description: 'The little icon in the browser tab. Use a square image, at least 512 × 512. Leave empty for the pink dot.',
+      options: {hotspot: true},
+    }),
+    defineField({
       name: 'ohpIntro',
       title: 'ONE HOUR PHOTO intro',
       type: 'text',
