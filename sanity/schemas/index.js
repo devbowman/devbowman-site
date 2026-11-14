@@ -1,14 +1,16 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {FeatureInput} from '../components/FeatureInput'
 import {PhotoInput} from '../components/PhotoInput'
 import {ImagesWithBulkTags} from '../components/ImagesWithBulkTags'
-import {SelectsOrderInput} from '../components/SelectsOrderInput'
 
 export const project = defineType({
   name: 'project',
   title: 'Project',
   type: 'document',
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({type: 'project', newItemPosition: 'before'}),
     defineField({
       name: 'title',
       title: 'Title',
@@ -90,15 +92,6 @@ export const siteSettings = defineType({
           ],
         }),
       ],
-    }),
-    defineField({
-      name: 'indexOrder',
-      title: 'Selects order',
-      type: 'array',
-      description:
-        'Every published project appears here automatically (new ones at the top). Drag to reorder: top of the list = top of the page. Then Publish.',
-      components: {input: SelectsOrderInput},
-      of: [defineArrayMember({type: 'reference', to: [{type: 'project'}], weak: true})],
     }),
   ],
   preview: {prepare: () => ({title: 'Site settings'})},
