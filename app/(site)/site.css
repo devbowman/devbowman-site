@@ -156,8 +156,7 @@ img { max-width: 100%; }
 .viewer.go-close { cursor: zoom-out; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .viewer .frame img { display: block; max-height: 100%; max-width: 100%; object-fit: contain; }
-.viewer .big { flex: 0 1 58%; }
-.viewer .small { flex: 0 1 30%; height: 60%; }
+.viewer .big { flex: 0 1 100%; }
 .info { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 1.2rem); transform: translateX(-50%); width: min(34rem, calc(100% - 32px)); text-align: center; color: var(--mute); text-wrap: balance; }
 @media (max-width: 640px) {
   .viewer .big { flex-basis: 100%; }

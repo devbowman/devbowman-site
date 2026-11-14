@@ -361,7 +361,6 @@ export default function Site({site, ohp}) {
 
 function Viewer({current, view, next, step, close}) {
   const f = current.frames[view.i]
-  const many = current.frames.length > 1
   const [side, setSide] = useState('next')
   const touch = useRef(null)
   const img = useRef(null)
@@ -404,11 +403,7 @@ function Viewer({current, view, next, step, close}) {
       <div className="frame big">
         <img ref={img} src={f.full} alt={f.alt} />
       </div>
-      {many && (
-        <div className="frame small">
-          <img src={next.full} alt={next.alt} />
-        </div>
-      )}
+      {next && next !== f && <link rel="preload" as="image" href={next.full} />}
       {current.info && <p className="info">{current.info}</p>}
       <button className="sr-only" onClick={(e) => (e.stopPropagation(), step(-1))}>
         Previous image
