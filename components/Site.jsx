@@ -169,6 +169,17 @@ export default function Site({site, ohp, initialFilter = null}) {
     const slug = site.categories.find((c) => c.id === next[0])?.slug
     history.replaceState(null, '', (slug ? `/${slug}` : '/') + location.hash)
   }
+  const shuffleButton = (className) => (
+    <button className={className} onClick={shuffle} aria-label="Shuffle the projects" title="Shuffle">
+      <svg key={shuffles} className={shuffles ? 'spun' : undefined} viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M2.5 7H6c2.6 0 3.9 2.2 5 5s2.4 5 5 5h4.5" />
+        <path d="M2.5 17H6c1.5 0 2.5-.8 3.4-2.1" />
+        <path d="M13.6 9.1C14.5 7.8 15.5 7 17 7h3.5" />
+        <path d="M18 4l3 3-3 3" />
+        <path d="M18 14l3 3-3 3" />
+      </svg>
+    </button>
+  )
   const shuffle = () => {
     setView(null)
     const keys = site.projects.map((p) => p.key)
@@ -299,6 +310,8 @@ export default function Site({site, ohp, initialFilter = null}) {
 
   return (
     <div className="site">
+      {/* On phones the shuffle button floats in the bottom right while you're on Selects */}
+      {panel === 'selects' && !view && site.projects.length > 1 && shuffleButton('shuffle-bubble')}
       <button
         className="mode-dot"
         aria-label={pink ? 'Switch to the regular colors' : 'Switch to pink mode'}
@@ -383,15 +396,7 @@ export default function Site({site, ohp, initialFilter = null}) {
                     </button>
                   ))}
                 </div>
-                <button className="shuffle" onClick={shuffle} aria-label="Shuffle the projects" title="Shuffle">
-                  <svg key={shuffles} className={shuffles ? 'spun' : undefined} viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M2.5 7H6c2.6 0 3.9 2.2 5 5s2.4 5 5 5h4.5" />
-                    <path d="M2.5 17H6c1.5 0 2.5-.8 3.4-2.1" />
-                    <path d="M13.6 9.1C14.5 7.8 15.5 7 17 7h3.5" />
-                    <path d="M18 4l3 3-3 3" />
-                    <path d="M18 14l3 3-3 3" />
-                  </svg>
-                </button>
+                {shuffleButton("shuffle")}
               </nav>
             )}
             {site.projects.length ? (

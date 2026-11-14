@@ -143,6 +143,21 @@ img { max-width: 100%; }
 /* The shuffle button: a small round icon under the tags */
 .site .filters .shuffle { width: 32px; height: 32px; padding: 0; display: grid; place-items: center; background: none; box-shadow: none; color: var(--ink); transition: opacity 0.2s; }
 .site .filters .shuffle:hover { background: none; opacity: 0.6; }
+.site .shuffle-bubble { display: none; }
+@media (max-width: 700px) {
+  .site .filters .shuffle { display: none; }
+  .site .shuffle-bubble {
+    display: grid; place-items: center; position: fixed; z-index: 20;
+    right: max(16px, calc(env(safe-area-inset-right, 0px) + 16px));
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--ink); color: var(--paper);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  }
+  .site .shuffle-bubble:active { transform: scale(0.94); }
+  .site .shuffle-bubble svg { width: 22px; height: 22px; }
+}
+.site .shuffle-bubble svg.spun { animation: shuffle-spin 0.45s var(--ease); }
 .site .filters .shuffle svg.spun { animation: shuffle-spin 0.45s var(--ease); }
 @keyframes shuffle-spin { from { transform: rotate(-180deg) scale(0.7); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .site .filters .shuffle svg { animation: none; } }
