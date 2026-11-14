@@ -136,7 +136,11 @@ export default function Site({site, ohp}) {
   const [copied, setCopied] = useState('')
   const pill = useRef(null)
   const [knob, setKnob] = useState({x: 0, w: 0})
-  const [filter, setFilter] = useState('all')
+  // Tags people have switched on; none means everything. Several can be on at once.
+  const [filters, setFilters] = useState([])
+  // A shuffled project order (list of project keys), or null for the Studio's order.
+  const [order, setOrder] = useState(null)
+  const [shuffles, setShuffles] = useState(0)
   // Filters scroll away going down and slide back in when you scroll up.
   const [filtersShown, setFiltersShown] = useState(true)
   const lastY = useRef(0)
@@ -147,13 +151,30 @@ export default function Site({site, ohp}) {
     else if (y > lastY.current + 6) setFiltersShown(false)
     lastY.current = y
   }
-  // Filtering keeps only the photos with that tag (projects with none drop out).
-  const selects =
-    filter === 'all'
-      ? site.projects
-      : site.projects
-          .map((p) => ({...p, frames: p.frames.filter((f) => f.tags.includes(filter))}))
-          .filter((p) => p.frames.length)
+  // Filtering keeps the photos carrying any switched-on tag (projects with none drop out).
+  const ordered = order
+    ? [...site.projects].sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key))
+    : site.projects
+  const selects = filters.length
+    ? ordered
+        .map((p) => ({...p, frames: p.frames.filter((f) => f.tags.some((t) => filters.includes(t)))}))
+        .filter((p) => p.frames.length)
+    : ordered
+  const toggleFilter = (id) => {
+    setView(null)
+    if (id === 'all') return setFilters([])
+    setFilters((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]))
+  }
+  const shuffle = () => {
+    setView(null)
+    const keys = site.projects.map((p) => p.key)
+    for (let i = keys.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[keys[i], keys[j]] = [keys[j], keys[i]]
+    }
+    setOrder(keys)
+    setShuffles((n) => n + 1)
+  }
   const lists = {selects, ohp}
 
   const go = useCallback((name, push) => {
@@ -347,23 +368,30 @@ export default function Site({site, ohp}) {
           <div className="wrap">
             {site.categories.length > 0 && (
               <nav className={`filters${filtersShown ? '' : ' tucked'}`} aria-label="Filter by tag">
-                {[{id: 'all', title: 'All'}, ...site.categories].map((c) => (
-                  <button
-                    key={c.id}
-                    aria-pressed={filter === c.id}
-                    onClick={() => {
-                      setView(null)
-                      // Clicking the active tag again turns it off.
-                      setFilter(filter === c.id ? 'all' : c.id)
-                    }}
-                  >
-                    {c.title}
-                  </button>
-                ))}
+                <div className="tags">
+                  {[{id: 'all', title: 'All'}, ...site.categories].map((c) => (
+                    <button
+                      key={c.id}
+                      aria-pressed={c.id === 'all' ? filters.length === 0 : filters.includes(c.id)}
+                      onClick={() => toggleFilter(c.id)}
+                    >
+                      {c.title}
+                    </button>
+                  ))}
+                </div>
+                <button className="shuffle" onClick={shuffle} aria-label="Shuffle the projects" title="Shuffle">
+                  <svg key={shuffles} className={shuffles ? "spun" : undefined} viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M16 3h5v5" />
+                    <path d="M4 20 21 3" />
+                    <path d="M21 16v5h-5" />
+                    <path d="M15 15l6 6" />
+                    <path d="M4 4l5 5" />
+                  </svg>
+                </button>
               </nav>
             )}
             {site.projects.length ? (
-              <Grid key={filter} projects={selects} offset={filter === 'all' ? 3 : 0} onHover={setHover} onOpen={open('selects')} />
+              <Grid key={`${filters.join()}|${shuffles}`} projects={selects} offset={filters.length || order ? 0 : 3} onHover={setHover} onOpen={open('selects')} />
             ) : (
               <p className="empty">No projects yet. Add one at dev.pictures/studio.</p>
             )}
