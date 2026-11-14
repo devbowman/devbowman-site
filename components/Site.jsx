@@ -261,6 +261,10 @@ export default function Site({site, ohp}) {
   const next = current ? current.frames[(view.i + 1) % current.frames.length] : null
   const email = site.email || FALLBACK_EMAIL
   const links = site.links || []
+  // The address is filled in after the page loads, so it never sits in the page's HTML,
+  // where Cloudflare would replace it with "[email protected]" and spam bots could read it.
+  const [showEmail, setShowEmail] = useState(false)
+  useEffect(() => setShowEmail(true), [])
 
   const copy = async () => {
     try {
@@ -321,7 +325,7 @@ export default function Site({site, ohp}) {
                 <div className="contact">
                   <p className="m">Contact</p>
                   <div className="copyrow">
-                    <a href={`mailto:${email}`}>{email}</a>
+                    {showEmail ? <a href={`mailto:${email}`}>{email}</a> : <span aria-hidden="true">&nbsp;</span>}
                     <button onClick={copy}>{copied || 'Copy'}</button>
                   </div>
                 </div>
