@@ -121,6 +121,19 @@ export default function Site({site, ohp}) {
   const [panel, setPanel] = useState('selects')
   const [hover, setHover] = useState('')
   const [view, setView] = useState(null) // {list: 'selects'|'ohp', p, i}
+  // Pink mode, remembered per visitor.
+  const [pink, setPink] = useState(false)
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('mode') === 'pink') setPink(true)
+    } catch {}
+  }, [])
+  useEffect(() => {
+    document.documentElement.dataset.mode = pink ? 'pink' : ''
+    try {
+      localStorage.setItem('mode', pink ? 'pink' : 'plain')
+    } catch {}
+  }, [pink])
   const [copied, setCopied] = useState('')
   const pill = useRef(null)
   const [knob, setKnob] = useState({x: 0, w: 0})
@@ -262,6 +275,13 @@ export default function Site({site, ohp}) {
 
   return (
     <div className="site">
+      <button
+        className="mode-dot"
+        aria-label={pink ? 'Switch to the regular colors' : 'Switch to pink mode'}
+        aria-pressed={pink}
+        title={pink ? 'Back to white' : 'Pink mode'}
+        onClick={() => setPink((v) => !v)}
+      />
       <header className={`top${panel === 'ohp' ? ' on-ohp' : ''}`}>
         <nav className="pill" aria-label="Sections" ref={pill}>
           <span className="knob" style={{width: knob.w, transform: `translateX(${knob.x}px)`}} />

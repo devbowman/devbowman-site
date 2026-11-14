@@ -40,11 +40,40 @@
   }
 }
 
+/* Pink mode: the site's playful take on dark mode, toggled by the circle in the top left */
+:root[data-mode="pink"] {
+  --pink: #fecde3;
+  --pinker: #fd3e95;
+  --paper: var(--pink);
+  --ink: var(--pinker);
+  --mute: color-mix(in srgb, var(--pinker) 72%, var(--pink));
+  --rule: color-mix(in srgb, var(--pinker) 25%, var(--pink));
+  --frame: color-mix(in srgb, var(--pinker) 12%, var(--pink));
+  --pill: color-mix(in srgb, var(--pinker) 24%, var(--pink));
+  --tag: color-mix(in srgb, var(--pinker) 12%, var(--pink));
+  --tag-hover: color-mix(in srgb, var(--pinker) 20%, var(--pink));
+  color-scheme: light;
+}
+
+/* The mode switch: a filled circle in the top left, showing the color you'd switch to */
+.mode-dot {
+  position: fixed; z-index: 21;
+  top: calc(env(safe-area-inset-top, 0px) + 25px);
+  left: max(18px, calc(env(safe-area-inset-left, 0px) + 18px));
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #fd3e95;
+  transition: background-color 0.4s var(--ease), transform 0.2s var(--ease);
+}
+.mode-dot:hover { transform: scale(1.12); }
+:root[data-mode="pink"] .mode-dot { background: #141312; }
+@media (max-width: 420px) { .mode-dot { width: 16px; height: 16px; top: calc(env(safe-area-inset-top, 0px) + 28px); left: max(10px, calc(env(safe-area-inset-left, 0px) + 10px)); } }
+
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; background: var(--paper); }
+html, body { margin: 0; height: 100%; background: var(--paper); transition: background-color 0.4s; }
 img { max-width: 100%; }
 
 .site {
+  transition: background-color 0.4s, color 0.4s;
   position: fixed;
   inset: 0;
   overflow: hidden;
