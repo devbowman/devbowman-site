@@ -125,6 +125,16 @@ export default function Site({site, ohp}) {
   const pill = useRef(null)
   const [knob, setKnob] = useState({x: 0, w: 0})
   const [filter, setFilter] = useState('all')
+  // Filters scroll away going down and slide back in when you scroll up.
+  const [filtersShown, setFiltersShown] = useState(true)
+  const lastY = useRef(0)
+  const onSelectsScroll = (e) => {
+    const y = e.currentTarget.scrollTop
+    if (y < 60) setFiltersShown(true)
+    else if (y < lastY.current - 6) setFiltersShown(true)
+    else if (y > lastY.current + 6) setFiltersShown(false)
+    lastY.current = y
+  }
   // Filtering keeps only the photos with that tag (projects with none drop out).
   const selects =
     filter === 'all'
@@ -327,17 +337,18 @@ export default function Site({site, ohp}) {
           </div>
         </section>
 
-        <section className={`panel${view?.list === 'selects' ? ' locked' : ''}`} aria-label="Selects">
+        <section className={`panel${view?.list === 'selects' ? ' locked' : ''}`} aria-label="Selects" onScroll={onSelectsScroll}>
           <div className="wrap">
             {site.categories.length > 0 && (
-              <nav className="filters" aria-label="Filter by tag">
+              <nav className={`filters${filtersShown ? '' : ' tucked'}`} aria-label="Filter by tag">
                 {[{id: 'all', title: 'All'}, ...site.categories].map((c) => (
                   <button
                     key={c.id}
                     aria-pressed={filter === c.id}
                     onClick={() => {
                       setView(null)
-                      setFilter(c.id)
+                      // Clicking the active tag again turns it off.
+                      setFilter(filter === c.id ? 'all' : c.id)
                     }}
                   >
                     {c.title}
