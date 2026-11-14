@@ -268,7 +268,7 @@ export default function Site({site, ohp}) {
               <button onClick={() => setView(null)}>Close</button>
             </>
           ) : (
-            <span>{hover}</span>
+            <span>{panel === 'ohp' ? '' : hover}</span>
           )}
         </div>
       </header>
