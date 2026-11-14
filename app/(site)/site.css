@@ -56,7 +56,7 @@
 }
 
 /* The mode switch: a filled circle in the top left, showing the color you'd switch to */
-.mode-dot {
+.site .mode-dot {
   position: fixed; z-index: 21;
   top: calc(env(safe-area-inset-top, 0px) + 25px);
   left: max(18px, calc(env(safe-area-inset-left, 0px) + 18px));
@@ -64,9 +64,9 @@
   background: #fd3e95;
   transition: background-color 0.4s var(--ease), transform 0.2s var(--ease);
 }
-.mode-dot:hover { transform: scale(1.12); }
-:root[data-mode="pink"] .mode-dot { background: #141312; }
-@media (max-width: 420px) { .mode-dot { width: 16px; height: 16px; top: calc(env(safe-area-inset-top, 0px) + 28px); left: max(10px, calc(env(safe-area-inset-left, 0px) + 10px)); } }
+.site .mode-dot:hover { transform: scale(1.12); }
+:root[data-mode="pink"] .site .mode-dot { background: #141312; }
+@media (max-width: 420px) { .site .mode-dot { width: 16px; height: 16px; top: calc(env(safe-area-inset-top, 0px) + 28px); left: max(10px, calc(env(safe-area-inset-left, 0px) + 10px)); } }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: var(--paper); transition: background-color 0.4s; }
