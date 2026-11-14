@@ -33,7 +33,7 @@ export function FeatureInput({value, readOnly}) {
       const recent = features?.find((f) => norm(f.link) === norm(link))
       let post = recent
       if (!post) {
-        const r = await fetch('/api/ohp?post=' + encodeURIComponent(link))
+        const r = await fetch('/api/ohp-post?link=' + encodeURIComponent(link))
         if (!r.ok) throw new Error("Couldn't find that post. Check the link and try again.")
         post = await r.json()
       }

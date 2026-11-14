@@ -72,7 +72,7 @@ export function planSync(feed, docs) {
 }
 
 export async function syncOhpFeatures(client) {
-  const res = await fetch('/api/ohp')
+  const res = await fetch('/ohp-feed.json', {cache: 'no-store'})
   if (!res.ok) return null
   const feed = await res.json()
   // If the feed comes back short or empty, do nothing rather than delete entries by mistake.
@@ -93,7 +93,7 @@ export async function syncOhpFeatures(client) {
   const feedLinks = new Set(feed.map((f) => norm(f.link)))
   const missingPhotos = docs.filter((d) => !d._id.startsWith('drafts.') && d.pinned && d.feature && !feedLinks.has(norm(d.feature)) && !d.frames?.length)
   for (const d of missingPhotos) {
-    const r = await fetch('/api/ohp?post=' + encodeURIComponent(d.feature))
+    const r = await fetch('/api/ohp-post?link=' + encodeURIComponent(d.feature))
     if (!r.ok) continue
     const post = await r.json()
     tx.patch(d._id, (x) => x.set({postTitle: post.title, postInfo: post.info || '', thumb: post.frames?.[0], frames: post.frames || [], ...(post.date ? {postDate: post.date} : {})}))

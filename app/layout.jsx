@@ -4,6 +4,7 @@ const base = {
   metadataBase: new URL('https://dev.pictures'),
   title: 'Dev Bowman',
   description: 'Dev Bowman is a photographer, writer, and editor in Brooklyn, and the creator of ONE HOUR PHOTO.',
+  alternates: {canonical: '/'},
   openGraph: {title: 'Dev Bowman', siteName: 'Dev Bowman', type: 'website', url: 'https://dev.pictures'},
 }
 
@@ -11,7 +12,7 @@ const base = {
 export async function generateMetadata() {
   let url = null
   try {
-    url = await client.fetch(`*[_id == "siteSettings"][0].favicon.asset->url`, {}, {next: {revalidate: 60}})
+    url = await client.fetch(`*[_id == "siteSettings"][0].favicon.asset->url`)
   } catch {}
   const sized = (n) => `${url}?w=${n}&h=${n}&fit=crop&auto=format`
   return {
@@ -25,7 +26,15 @@ export async function generateMetadata() {
 export default function RootLayout({children}) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {/* Visitors on the old address (devbowman.co) are sent to dev.pictures. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if(/(^|\\.)devbowman\\.co$/.test(location.hostname))location.replace('https://dev.pictures/'+location.hash)`,
+          }}
+        />
+        {children}
+      </body>
     </html>
   )
 }

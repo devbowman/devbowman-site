@@ -2,13 +2,13 @@ import {useEffect, useState} from 'react'
 
 let cache = null
 
-// Loads the ONE HOUR PHOTO features from the site's /api/ohp route.
+// Loads the ONE HOUR PHOTO features from the list written at each site build (/ohp-feed.json).
 export function useFeatures() {
   const [state, setState] = useState(cache ? {features: cache, error: null} : {features: null, error: null})
   useEffect(() => {
     if (cache) return
     let live = true
-    fetch('/api/ohp')
+    fetch('/ohp-feed.json', {cache: 'no-store'})
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((data) => {
         cache = data
@@ -42,7 +42,7 @@ export function useFeature(link) {
     if (!link || !features || inFeed || postCache.has(key)) return
     const entry = {data: null, error: null, done: false}
     postCache.set(key, entry)
-    fetch('/api/ohp?post=' + encodeURIComponent(link))
+    fetch('/api/ohp-post?link=' + encodeURIComponent(link))
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('That post could not be found.'))))
       .then((data) => (entry.data = data))
       .catch((e) => {
