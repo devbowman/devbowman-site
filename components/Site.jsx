@@ -272,17 +272,7 @@ export default function Site({site, ohp}) {
           ))}
         </nav>
         <div className="caption" aria-live="polite">
-          {current ? (
-            <>
-              <span>{current.short}</span>
-              <span>
-                {view.i + 1}/{current.frames.length}
-              </span>
-              <button onClick={() => setView(null)}>Close</button>
-            </>
-          ) : (
-            <span>{panel === 'ohp' ? '' : hover}</span>
-          )}
+          <span>{current || panel === 'ohp' ? '' : hover}</span>
         </div>
       </header>
 
@@ -431,7 +421,24 @@ function Viewer({current, view, next, step, close}) {
         <img ref={img} src={f.full} alt={f.alt} />
       </div>
       {next && next !== f && <link rel="preload" as="image" href={next.full} />}
-      {current.info && <p className="info">{current.info}</p>}
+      <div className="viewer-meta">
+        <div className="viewer-line">
+          <span className="viewer-title">{current.short}</span>
+          <span className="viewer-count">
+            {view.i + 1}/{current.frames.length}
+          </span>
+          <button
+            className="viewer-close"
+            onClick={(e) => {
+              e.stopPropagation()
+              close()
+            }}
+          >
+            Close
+          </button>
+        </div>
+        {current.info && <p className="info">{current.info}</p>}
+      </div>
       <button className="sr-only" onClick={(e) => (e.stopPropagation(), step(-1))}>
         Previous image
       </button>

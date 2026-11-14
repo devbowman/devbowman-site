@@ -163,7 +163,7 @@ img { max-width: 100%; }
 .empty { text-align: center; color: var(--mute); padding-top: 30vh; }
 
 /* Viewer */
-.viewer { position: fixed; inset: 0; z-index: 15; -webkit-tap-highlight-color: transparent; user-select: none; background: var(--paper); display: flex; align-items: center; justify-content: center; gap: 2.2vw; padding: 5.2rem max(16px, env(safe-area-inset-right, 0px)) 4rem max(16px, env(safe-area-inset-left, 0px)); }
+.viewer { position: fixed; inset: 0; z-index: 15; -webkit-tap-highlight-color: transparent; user-select: none; background: var(--paper); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: calc(env(safe-area-inset-top, 0px) + 72px) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 18px) max(16px, env(safe-area-inset-left, 0px)); }
 .viewer .frame { display: flex; align-items: center; justify-content: center; height: 100%; min-width: 0; }
 .viewer.go-prev { cursor: w-resize; }
 .viewer.go-next { cursor: e-resize; }
@@ -171,10 +171,15 @@ img { max-width: 100%; }
 .viewer.go-link { cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .viewer .frame img { display: block; max-height: 100%; max-width: 100%; object-fit: contain; }
-.viewer .big { flex: 0 1 100%; }
-.info { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 1.2rem); transform: translateX(-50%); width: min(34rem, calc(100% - 32px)); text-align: center; color: var(--mute); text-wrap: balance; }
+.viewer .big { flex: 1 1 auto; min-height: 0; width: 100%; }
+.viewer-meta { flex: none; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; max-width: 34rem; }
+.viewer-line { display: flex; align-items: baseline; justify-content: center; flex-wrap: wrap; gap: 4px 18px; font-size: 16px; }
+.viewer-title { color: var(--ink); }
+.viewer-count { color: var(--mute); font-variant-numeric: tabular-nums; }
+.site .viewer-close { color: var(--mute); font-size: 16px; }
+.site .viewer-close:hover { color: var(--ink); }
+.info { margin: 0; color: var(--mute); font-size: 13px; text-wrap: balance; }
 @media (max-width: 640px) {
-  .viewer .big { flex-basis: 100%; }
   .viewer .small { display: none; }
 }
 
