@@ -89,6 +89,13 @@ export const siteSettings = defineType({
     }),
     defineField({name: 'email', title: 'Contact email', type: 'string'}),
     defineField({
+      name: 'ohpIntro',
+      title: 'ONE HOUR PHOTO intro',
+      type: 'text',
+      rows: 2,
+      description: 'The line at the top of the ONE HOUR PHOTO tab. It links to your Substack.',
+    }),
+    defineField({
       name: 'links',
       title: 'Links',
       type: 'array',

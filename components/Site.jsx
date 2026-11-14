@@ -354,8 +354,7 @@ export default function Site({site, ohp}) {
             {ohp.length ? (
               <>
                 <a className="ohp-intro" href="https://www.onehour.photo" target="_blank" rel="noopener">
-                  <strong>ONE HOUR PHOTO</strong>
-                  <span>My weekly Substack featuring portraits and interviews, all shot on film. ↗</span>
+                  <span>{site.ohpIntro || 'My weekly Substack featuring portraits and interviews, all shot on film.'} ↗</span>
                 </a>
                 <Covers projects={ohp} onHover={setHover} />
               </>
