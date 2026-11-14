@@ -59,10 +59,10 @@ function Grid({projects, offset, onHover, onOpen}) {
   const cells = []
   projects.forEach((p, pi) => {
     const gaps = pi === 0 ? offset : 1 + (hash(p.title) % 3)
-    for (let k = 0; k < gaps; k++) cells.push(<div className="cell" aria-hidden="true" key={`${p.key}-gap${k}`} />)
+    for (let k = 0; k < gaps; k++) cells.push(<div className="cell gap" aria-hidden="true" key={`${p.key}-gap${k}`} />)
     p.frames.forEach((f, j) =>
       cells.push(
-        <div className="cell" key={`${p.key}-${j}`}>
+        <div className="cell" key={`${p.key}-${j}`} style={{'--ratio': f.ratio || 0.8}}>
           <button
             className="tile"
             aria-label={`${p.title}, image ${j + 1} of ${p.frames.length}`}
