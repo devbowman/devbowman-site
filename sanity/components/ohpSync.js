@@ -42,7 +42,9 @@ export function planSync(feed, docs) {
       feature: f.link,
       postTitle: f.title,
       postDate: f.date || undefined,
+      postInfo: f.info || undefined,
       thumb: f.frames?.[0] || undefined,
+      frames: f.frames || [],
       pinned: false,
       hidden: false,
       photo: 1,
@@ -54,9 +56,9 @@ export function planSync(feed, docs) {
     const e = byLink.get(norm(f.link))
     if (!e?.published) continue
     const p = e.published
-    const want = {postTitle: f.title, thumb: f.frames?.[0] || null, postDate: f.date || null}
+    const want = {postTitle: f.title, thumb: f.frames?.[0] || null, postDate: f.date || null, postInfo: f.info || null, frames: f.frames?.length ? f.frames : null}
     const set = {}
-    for (const [k, v] of Object.entries(want)) if (v && p[k] !== v) set[k] = v
+    for (const [k, v] of Object.entries(want)) if (v && JSON.stringify(p[k]) !== JSON.stringify(v)) set[k] = v
     if (Object.keys(set).length) patches.push({id: e.id, set, draft: !!e.draft})
   }
 
@@ -75,9 +77,8 @@ export async function syncOhpFeatures(client) {
   const feed = await res.json()
   // If the feed comes back short or empty, do nothing rather than delete entries by mistake.
   if (!Array.isArray(feed) || feed.length < 5) return null
-  const docs = await client.fetch(`*[_type == "ohpCover"]{_id, feature, pinned, postTitle, thumb, postDate, orderRank}`)
+  const docs = await client.fetch(`*[_type == "ohpCover"]{_id, feature, pinned, postTitle, postInfo, thumb, frames, postDate, orderRank}`)
   const {creates, patches, deletes} = planSync(feed, docs)
-  if (!creates.length && !patches.length && !deletes.length) return {creates: 0, patches: 0, deletes: 0}
   const tx = client.transaction()
   creates.forEach((d) => tx.createIfNotExists(d))
   patches.forEach((p) => {
@@ -88,6 +89,16 @@ export async function syncOhpFeatures(client) {
     if (d.published) tx.delete(d.id)
     if (d.draft) tx.delete(`drafts.${d.id}`)
   })
+  // Pinned older posts need their photos saved so the site never has to look them up.
+  const feedLinks = new Set(feed.map((f) => norm(f.link)))
+  const missingPhotos = docs.filter((d) => !d._id.startsWith('drafts.') && d.pinned && d.feature && !feedLinks.has(norm(d.feature)) && !d.frames?.length)
+  for (const d of missingPhotos) {
+    const r = await fetch('/api/ohp?post=' + encodeURIComponent(d.feature))
+    if (!r.ok) continue
+    const post = await r.json()
+    tx.patch(d._id, (x) => x.set({postTitle: post.title, postInfo: post.info || '', thumb: post.frames?.[0], frames: post.frames || [], ...(post.date ? {postDate: post.date} : {})}))
+  }
+  if (!creates.length && !patches.length && !deletes.length && !missingPhotos.length) return {creates: 0, patches: 0, deletes: 0}
   await tx.commit()
-  return {creates: creates.length, patches: patches.length, deletes: deletes.length}
+  return {creates: creates.length, patches: patches.length, deletes: deletes.length, backfilled: missingPhotos.length}
 }

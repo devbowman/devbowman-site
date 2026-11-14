@@ -41,6 +41,8 @@ export function FeatureInput({value, readOnly}) {
         feature: post.link || link,
         postTitle: post.title,
         thumb: post.frames?.[0],
+        frames: post.frames || [],
+        ...(post.info ? {postInfo: post.info} : {}),
         ...(post.date ? {postDate: post.date} : {}),
       }
       // Older posts only stay in the list while pinned, so pin them straight away.

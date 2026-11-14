@@ -169,6 +169,8 @@ export const ohpCover = defineType({
     }),
     defineField({name: 'postDate', type: 'datetime', hidden: true, readOnly: true}),
     defineField({name: 'thumb', type: 'url', hidden: true, readOnly: true}),
+    defineField({name: 'postInfo', type: 'string', hidden: true, readOnly: true}),
+    defineField({name: 'frames', type: 'array', of: [{type: 'string'}], hidden: true, readOnly: true}),
   ],
   preview: {
     select: {
@@ -178,11 +180,13 @@ export const ohpCover = defineType({
       hidden: 'hidden',
       pinned: 'pinned',
       thumb: 'thumb',
+      frames: 'frames',
+      photo: 'photo',
       coverUrl: 'coverUrl',
       image: 'image',
     },
-    prepare: ({feature, postTitle, name, hidden, pinned, thumb, coverUrl, image}) => {
-      const src = coverUrl || thumb
+    prepare: ({feature, postTitle, name, hidden, pinned, thumb, frames, photo, coverUrl, image}) => {
+      const src = coverUrl || (frames && frames[(photo || 1) - 1]) || thumb
       return {
         title: (pinned ? '📌 ' : '') + (name || postTitle || (feature || '').replace(/^.*\/p\//, '').replace(/-/g, ' ') || 'New feature'),
         subtitle: [hidden ? 'Hidden' : null, name && postTitle ? postTitle : null].filter(Boolean).join(' · ') || undefined,

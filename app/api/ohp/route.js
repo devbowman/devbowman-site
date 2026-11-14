@@ -4,7 +4,7 @@ import {getOHP, getPost} from '../../../lib/ohp'
 // ?post=<link> returns one older post instead.
 export const revalidate = 3600
 
-const slim = (f) => ({link: f.link, title: f.title, short: f.short, date: f.date, frames: f.frames.map((x) => x.thumb)})
+const slim = (f) => ({link: f.link, title: f.title, short: f.short, date: f.date, info: f.info, frames: f.frames.map((x) => x.thumb)})
 
 export async function GET(request) {
   const post = new URL(request.url).searchParams.get('post')
