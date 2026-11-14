@@ -29,7 +29,7 @@ function Bio({blocks}) {
         {b.children?.map((c) => {
           const link = b.markDefs?.find((d) => c.marks?.includes(d._key) && d._type === 'link')
           return link ? (
-            <a key={c._key} href={link.href}>
+            <a key={c._key} href={link.href} target="_blank" rel="noopener">
               {c.text}
             </a>
           ) : (
