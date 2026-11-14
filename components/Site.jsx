@@ -12,7 +12,6 @@ const FALLBACK_BIO = [
   'His work has been published in Interview, Nylon, PAPER, Rolling Stone, The Cut, Vanity Fair, InStyle, Forbes and more.',
 ]
 const FALLBACK_EMAIL = 'dev@onehour.photo'
-const FALLBACK_LINKS = [{label: '@dev.baby', url: 'https://www.instagram.com/dev.baby/'}]
 
 function hash(s) {
   let h = 2166136261
@@ -261,7 +260,7 @@ export default function Site({site, ohp}) {
   const current = view ? lists[view.list][view.p] : null
   const next = current ? current.frames[(view.i + 1) % current.frames.length] : null
   const email = site.email || FALLBACK_EMAIL
-  const links = site.links?.length ? site.links : FALLBACK_LINKS
+  const links = site.links || []
 
   const copy = async () => {
     try {
@@ -319,24 +318,26 @@ export default function Site({site, ohp}) {
               )}
               <Bio blocks={site.bio} />
               {email && (
-                <>
+                <div className="contact">
                   <p className="m">Contact</p>
                   <div className="copyrow">
                     <a href={`mailto:${email}`}>{email}</a>
                     <button onClick={copy}>{copied || 'Copy'}</button>
                   </div>
-                </>
+                </div>
               )}
-              <p>
-                {links.map((l, i) => (
-                  <span key={l.url}>
-                    {i > 0 && <br />}
-                    <a href={l.url} target="_blank" rel="noopener">
-                      {l.label}
-                    </a>
-                  </span>
-                ))}
-              </p>
+              {links.length > 0 && (
+                <p>
+                  {links.map((l, i) => (
+                    <span key={l.url}>
+                      {i > 0 && <br />}
+                      <a href={l.url} target="_blank" rel="noopener">
+                        {l.label}
+                      </a>
+                    </span>
+                  ))}
+                </p>
+              )}
             </div>
             <p className="m">© {new Date().getFullYear()} Dev Bowman. All rights reserved.</p>
           </div>

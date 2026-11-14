@@ -126,6 +126,8 @@ img { max-width: 100%; }
 .about .stack { display: flex; flex-direction: column; gap: 1.4em; max-width: 62ch; }
 .about .m { color: var(--mute); }
 .about .portrait { display: block; width: min(100%, 320px); height: auto; margin-bottom: 0.6em; }
+.about .contact { display: flex; flex-direction: column; gap: 0.5em; margin-top: 1.8em; }
+.about .contact p { margin: 0; }
 .copyrow { display: flex; gap: 10px; align-items: baseline; }
 .copyrow button { font-size: 10.5px; color: var(--mute) !important; }
 
