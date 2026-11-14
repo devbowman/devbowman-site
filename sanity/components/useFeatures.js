@@ -31,26 +31,34 @@ export const norm = (u = '') =>
     .replace(/\/+$/, '')
     .toLowerCase()
 
-// One post's details: from the feed when it's recent, otherwise fetched by its link.
+// One post's details: from the feed when it's recent, otherwise fetched by its link (cached per link).
+const postCache = new Map()
 export function useFeature(link) {
   const {features, error} = useFeatures()
   const inFeed = features?.find((f) => norm(f.link) === norm(link))
-  const [older, setOlder] = useState({link: null, data: null, error: null})
+  const key = norm(link || '')
+  const [, rerender] = useState(0)
   useEffect(() => {
-    if (!link || !features || inFeed || older.link === link) return
-    let live = true
-    setOlder({link, data: null, error: null})
+    if (!link || !features || inFeed || postCache.has(key)) return
+    const entry = {data: null, error: null, done: false}
+    postCache.set(key, entry)
     fetch('/api/ohp?post=' + encodeURIComponent(link))
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('That post could not be found'))))
-      .then((data) => live && setOlder({link, data, error: null}))
-      .catch((e) => live && setOlder({link, data: null, error: e.message}))
-    return () => {
-      live = false
-    }
-  }, [link, features, inFeed, older.link])
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('That post could not be found.'))))
+      .then((data) => (entry.data = data))
+      .catch((e) => {
+        entry.error = e.message
+        postCache.delete(key) // allow a retry next time
+        postCache.set(key + '#failed', entry)
+      })
+      .finally(() => {
+        entry.done = true
+        rerender((n) => n + 1)
+      })
+  }, [link, key, features, inFeed])
   if (!link) return {loading: false}
   if (!features) return {loading: !error, error}
   if (inFeed) return {feature: inFeed}
-  if (older.link !== link || (!older.data && !older.error)) return {loading: true}
-  return {feature: older.data, error: older.error}
+  const entry = postCache.get(key) || postCache.get(key + '#failed')
+  if (!entry || !entry.done) return {loading: true}
+  return {feature: entry.data, error: entry.error}
 }
