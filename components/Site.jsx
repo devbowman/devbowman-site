@@ -80,6 +80,15 @@ function Grid({projects, offset, onHover, onOpen}) {
   return <div className="grid">{cells}</div>
 }
 
+// Pushpin, like Instagram's pinned posts.
+function PinIcon() {
+  return (
+    <svg className="pin" viewBox="0 0 24 24" aria-label="Pinned" role="img">
+      <path d="M15.6 2.6a1 1 0 0 1 1.4 0l4.4 4.4a1 1 0 0 1 0 1.4l-1.2 1.2a1 1 0 0 1-1.1.2l-3.3 3.3.4 3.3a1 1 0 0 1-.3.8l-1.3 1.3a1 1 0 0 1-1.4 0l-3.2-3.2-5.3 5.3H3.3v-1.4l5.3-5.3-3.2-3.2a1 1 0 0 1 0-1.4l1.3-1.3a1 1 0 0 1 .8-.3l3.3.4 3.3-3.3a1 1 0 0 1 .2-1.1z" />
+    </svg>
+  )
+}
+
 // ONE HOUR PHOTO: one large portrait per feature. Hover shows the feature title; click opens it on Substack.
 function Covers({projects, onHover}) {
   return (
@@ -98,6 +107,7 @@ function Covers({projects, onHover}) {
         >
           <span className="tile">
             <Thumb frame={p.frames[0]} />
+            {p.pinned && <PinIcon />}
           </span>
           <span className="cover-label">
             <span className="cover-name">{p.short}</span>

@@ -30,3 +30,27 @@ export const norm = (u = '') =>
     .replace(/[?#].*$/, '')
     .replace(/\/+$/, '')
     .toLowerCase()
+
+// One post's details: from the feed when it's recent, otherwise fetched by its link.
+export function useFeature(link) {
+  const {features, error} = useFeatures()
+  const inFeed = features?.find((f) => norm(f.link) === norm(link))
+  const [older, setOlder] = useState({link: null, data: null, error: null})
+  useEffect(() => {
+    if (!link || !features || inFeed || older.link === link) return
+    let live = true
+    setOlder({link, data: null, error: null})
+    fetch('/api/ohp?post=' + encodeURIComponent(link))
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('That post could not be found'))))
+      .then((data) => live && setOlder({link, data, error: null}))
+      .catch((e) => live && setOlder({link, data: null, error: e.message}))
+    return () => {
+      live = false
+    }
+  }, [link, features, inFeed, older.link])
+  if (!link) return {loading: false}
+  if (!features) return {loading: !error, error}
+  if (inFeed) return {feature: inFeed}
+  if (older.link !== link || (!older.data && !older.error)) return {loading: true}
+  return {feature: older.data, error: older.error}
+}

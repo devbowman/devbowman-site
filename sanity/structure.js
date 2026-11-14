@@ -11,5 +11,5 @@ export const structure = (S, context) =>
       S.divider(),
       orderableDocumentListDeskItem({type: 'project', title: 'Projects', S, context}),
       S.documentTypeListItem('category').title('Tags'),
-      S.documentTypeListItem('ohpCover').title('ONE HOUR PHOTO covers'),
+      orderableDocumentListDeskItem({type: 'ohpCover', title: 'ONE HOUR PHOTO features', S, context}),
     ])

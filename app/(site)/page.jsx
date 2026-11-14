@@ -1,11 +1,11 @@
 import Site from '../../components/Site'
 import {getSite} from '../../lib/sanity'
-import {getOHP, applyCovers} from '../../lib/ohp'
+import {getOHP, buildOHP} from '../../lib/ohp'
 
 // Rebuild at most once a minute; the Substack feed itself is cached for an hour.
 export const revalidate = 60
 
 export default async function Home() {
   const [site, feed] = await Promise.all([getSite(), getOHP()])
-  return <Site site={site} ohp={applyCovers(feed, site.covers)} />
+  return <Site site={site} ohp={await buildOHP(feed, site.covers)} />
 }

@@ -99,15 +99,34 @@ export const siteSettings = defineType({
 
 export const ohpCover = defineType({
   name: 'ohpCover',
-  title: 'Feature cover',
+  title: 'ONE HOUR PHOTO feature',
   type: 'document',
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({type: 'ohpCover', newItemPosition: 'before'}),
     defineField({
       name: 'feature',
       title: 'Feature',
       type: 'string',
       components: {input: FeatureInput},
       validation: (r) => r.required(),
+    }),
+    defineField({
+      name: 'pinned',
+      title: 'Pin to the front',
+      type: 'boolean',
+      description:
+        'Pinned features always show first on ONE HOUR PHOTO with a pin icon, even once they are older than the latest 20 posts. Up to 5. Drag in the list to order them.',
+      initialValue: false,
+      validation: (r) =>
+        r.custom(async (value, ctx) => {
+          if (!value) return true
+          const id = String(ctx.document?._id || '').replace(/^drafts\./, '')
+          const others = await ctx
+            .getClient({apiVersion: '2025-10-01'})
+            .fetch('count(*[_type == "ohpCover" && pinned == true && !(_id in path("drafts.**")) && _id != $id])', {id})
+          return others >= 5 ? 'You can pin up to 5 features. Unpin one first.' : true
+        }),
     }),
     defineField({
       name: 'photo',
@@ -137,10 +156,10 @@ export const ohpCover = defineType({
     }),
   ],
   preview: {
-    select: {feature: 'feature', name: 'name', hidden: 'hidden', photo: 'photo', media: 'image'},
-    prepare: ({feature, name, hidden, photo, media}) => ({
-      title: name || (feature || '').replace(/^.*\/p\//, '').replace(/-/g, ' ') || 'New cover',
-      subtitle: hidden ? 'Hidden' : media ? 'Custom upload' : `Photo ${photo || 1}`,
+    select: {feature: 'feature', name: 'name', hidden: 'hidden', pinned: 'pinned', photo: 'photo', media: 'image'},
+    prepare: ({feature, name, hidden, pinned, photo, media}) => ({
+      title: (pinned ? '📌 ' : '') + (name || (feature || '').replace(/^.*\/p\//, '').replace(/-/g, ' ') || 'New feature'),
+      subtitle: [hidden ? 'Hidden' : null, media ? 'Custom cover' : photo > 1 ? `Cover: photo ${photo}` : null].filter(Boolean).join(' · ') || undefined,
       media,
     }),
   },

@@ -134,6 +134,8 @@ img { max-width: 100%; }
 @media (max-width: 560px) { .covers { grid-template-columns: repeat(2, 1fr); gap: 20px 8px; } }
 .cover { display: flex; flex-direction: column; gap: 8px; text-align: left; min-width: 0; }
 .cover .tile { aspect-ratio: 4 / 5; height: auto; }
+.cover .tile { position: relative; }
+.pin { position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; fill: #fff; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45)); pointer-events: none; }
 .site .cover { text-decoration: none; }
 .cover-label { display: grid; font-family: var(--mono); font-size: 11px; color: var(--mute); min-width: 0; }
 .cover-name, .cover-title { grid-area: 1 / 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: opacity 0.25s; }
