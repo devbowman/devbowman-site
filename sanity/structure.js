@@ -10,6 +10,6 @@ export const structure = (S, context) =>
         .child(S.document().schemaType('siteSettings').documentId('siteSettings').title('Site settings')),
       S.divider(),
       orderableDocumentListDeskItem({type: 'project', title: 'Projects', S, context}),
-      S.documentTypeListItem('category').title('Tags'),
+      orderableDocumentListDeskItem({type: 'category', title: 'Tags', S, context}),
       orderableDocumentListDeskItem({type: 'ohpCover', title: 'ONE HOUR PHOTO features', S, context}),
     ])

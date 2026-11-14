@@ -1,8 +1,9 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {Badge, Box, Button, Card, Checkbox, Flex, Select, Stack, Text, TextInput} from '@sanity/ui'
 import {insert, set, setIfMissing, useClient} from 'sanity'
+import {LexoRank} from 'lexorank'
 
-const TAGS = `*[_type == "category" && !(_id in path("drafts.**"))] | order(coalesce(order, 999) asc, title asc){_id, title}`
+const TAGS = `*[_type == "category" && !(_id in path("drafts.**"))] | order(coalesce(orderRank, "~") asc, title asc){_id, title}`
 const key = () => Math.random().toString(36).slice(2, 12)
 
 // Images field with a bulk-tagging panel above the normal image grid.
@@ -105,7 +106,10 @@ export function ImagesWithBulkTags(props) {
     }
     setBusy(true)
     try {
-      const doc = await client.create({_type: 'category', title})
+      // New tags go to the end of the filter.
+      const last = await client.fetch(`*[_type == "category" && defined(orderRank)] | order(orderRank desc)[0].orderRank`)
+      const orderRank = (last ? LexoRank.parse(last) : LexoRank.middle()).genNext().genNext().toString()
+      const doc = await client.create({_type: 'category', title, orderRank})
       setTags((t) => [...t, {_id: doc._id, title}])
       setTag(doc._id)
       setNewName('')
