@@ -58,8 +58,6 @@ function Thumb({frame}) {
 function Grid({projects, offset, onHover, onOpen}) {
   const cells = []
   projects.forEach((p, pi) => {
-    const gaps = pi === 0 ? 0 : 1 // one narrow space between projects
-    for (let k = 0; k < gaps; k++) cells.push(<div className="cell gap" aria-hidden="true" key={`${p.key}-gap${k}`} />)
     p.frames.forEach((f, j) =>
       cells.push(
         <div className="cell" key={`${p.key}-${j}`} style={{'--ratio': f.ratio || 0.8}}>

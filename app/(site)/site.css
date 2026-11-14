@@ -111,8 +111,6 @@ img { max-width: 100%; }
 /* Selects: every photo the same height, each keeps its own shape; rows are centered (nothing cropped) */
 .grid { --row: clamp(104px, 12.5vw, 190px); display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
 .cell { flex: none; height: var(--row); width: calc(var(--row) * var(--ratio, 0.8)); max-width: 100%; }
-.cell.gap { --ratio: 0.45; }
-@media (max-width: 560px) { .cell.gap { display: none; } }
 .tile { display: block; width: 100%; height: 100%; background: var(--frame); transition: opacity 0.25s; overflow: hidden; }
 .tile img { display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.4s; }
 .tile img.ready { opacity: 1; }
