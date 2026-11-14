@@ -293,6 +293,15 @@ export default function Site({site, ohp}) {
         <section className="panel" aria-label="About">
           <div className="about">
             <div className="stack">
+              {site.portrait && (
+                <img
+                  className="portrait"
+                  src={site.portrait.src}
+                  alt={site.portrait.alt}
+                  width={site.portrait.w}
+                  height={site.portrait.h}
+                />
+              )}
               <Bio blocks={site.bio} />
               {email && (
                 <>

@@ -73,6 +73,14 @@ export const siteSettings = defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'portrait',
+      title: 'Portrait',
+      type: 'image',
+      description: 'Shown at the top of the "Dev Bowman" panel.',
+      options: {hotspot: true},
+      fields: [defineField({name: 'alt', title: 'Description (for screen readers)', type: 'string'})],
+    }),
+    defineField({
       name: 'bio',
       title: 'Bio',
       type: 'array',
