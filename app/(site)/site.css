@@ -132,13 +132,35 @@ img { max-width: 100%; }
 .copyrow button { font-size: 10.5px; color: var(--mute) !important; }
 
 /* Selects filter */
-.filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 auto 1.8rem; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 84px); z-index: 5; transition: transform 0.35s var(--ease), opacity 0.25s; }
+.filters { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 0 auto 1.8rem; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 84px); z-index: 5; transition: transform 0.35s var(--ease), opacity 0.25s; }
 .filters.tucked { transform: translateY(-140%); opacity: 0; pointer-events: none; }
 .site .filters button { box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08); }
 @media (prefers-reduced-motion: reduce) { .filters { transition: none; } }
 .site .filters button { padding: 6px 12px; border-radius: 8px; background: var(--tag); color: var(--ink); font-size: 13px; transition: background-color 0.2s, color 0.2s; }
 .site .filters button:hover { background: var(--tag-hover); }
 .site .filters button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.filters .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+/* The shuffle button: a small round icon under the tags */
+.site .filters .shuffle { width: 32px; height: 32px; padding: 0; display: grid; place-items: center; background: none; box-shadow: none; color: var(--ink); transition: opacity 0.2s; }
+.site .filters .shuffle:hover { background: none; opacity: 0.6; }
+.site .shuffle-bubble { display: none; }
+@media (max-width: 700px) {
+  .site .filters .shuffle { display: none; }
+  .site .shuffle-bubble {
+    display: grid; place-items: center; position: fixed; z-index: 20;
+    right: max(16px, calc(env(safe-area-inset-right, 0px) + 16px));
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--paper); color: var(--ink);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), 0 6px 20px rgba(0, 0, 0, 0.16);
+  }
+  .site .shuffle-bubble:active { transform: scale(0.94); }
+  .site .shuffle-bubble svg { width: 22px; height: 22px; }
+}
+.site .shuffle-bubble svg.spun { animation: shuffle-spin 0.45s var(--ease); }
+.site .filters .shuffle svg.spun { animation: shuffle-spin 0.45s var(--ease); }
+@keyframes shuffle-spin { from { transform: rotate(-180deg) scale(0.7); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .site .filters .shuffle svg { animation: none; } }
 
 /* Grids */
 .wrap { padding: var(--content-top) max(10px, env(safe-area-inset-right, 0px)) 2rem max(10px, env(safe-area-inset-left, 0px)); }
