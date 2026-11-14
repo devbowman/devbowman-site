@@ -136,7 +136,7 @@ export default function Site({site, ohp}) {
   const [copied, setCopied] = useState('')
   const pill = useRef(null)
   const [knob, setKnob] = useState({x: 0, w: 0})
-  // Tags people have switched on; none means everything. Several can be on at once.
+  // The tag that's switched on (as a list of at most one); none means everything.
   const [filters, setFilters] = useState([])
   // A shuffled project order (list of project keys), or null for the Studio's order.
   const [order, setOrder] = useState(null)
@@ -163,7 +163,8 @@ export default function Site({site, ohp}) {
   const toggleFilter = (id) => {
     setView(null)
     if (id === 'all') return setFilters([])
-    setFilters((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]))
+    // One tag at a time; clicking the active tag again turns it off.
+    setFilters((f) => (f.includes(id) ? [] : [id]))
   }
   const shuffle = () => {
     setView(null)
