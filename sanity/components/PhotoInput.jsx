@@ -1,4 +1,4 @@
-import {Card, Grid, Stack, Text} from '@sanity/ui'
+import {Card, Stack, Text} from '@sanity/ui'
 import {set, useFormValue} from 'sanity'
 import {useFeatures, norm} from './useFeatures'
 
@@ -16,7 +16,7 @@ export function PhotoInput({value, onChange, readOnly}) {
       <Text size={1} muted>
         Click the photo to use as the cover. Selected: photo {chosen} of {feature.frames.length}.
       </Text>
-      <Grid columns={[3, 4, 5]} gap={2}>
+      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 8}}>
         {feature.frames.map((src, i) => {
           const on = chosen === i + 1
           return (
@@ -41,7 +41,7 @@ export function PhotoInput({value, onChange, readOnly}) {
             </Card>
           )
         })}
-      </Grid>
+      </div>
     </Stack>
   )
 }

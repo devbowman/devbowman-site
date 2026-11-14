@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import {Badge, Box, Button, Card, Checkbox, Flex, Grid, Select, Stack, Text, TextInput} from '@sanity/ui'
+import {Badge, Box, Button, Card, Checkbox, Flex, Select, Stack, Text, TextInput} from '@sanity/ui'
 import {insert, set, setIfMissing, useClient} from 'sanity'
 
 const TAGS = `*[_type == "category" && !(_id in path("drafts.**"))] | order(coalesce(order, 999) asc, title asc){_id, title}`
@@ -185,7 +185,7 @@ export function ImagesWithBulkTags(props) {
               />
             </Flex>
 
-            <Grid columns={[3, 4, 6]} gap={2}>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))', gap: 8}}>
               {value.map((item, i) => {
                 const on = selected.has(item._key)
                 const src = thumb(item.asset?._ref)
@@ -217,7 +217,7 @@ export function ImagesWithBulkTags(props) {
                   </Card>
                 )
               })}
-            </Grid>
+            </div>
 
             <Flex gap={2} wrap="wrap" align="center">
               <Box flex={1} style={{minWidth: 160}}>
