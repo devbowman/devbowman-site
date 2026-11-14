@@ -116,7 +116,7 @@ function Covers({projects, onHover}) {
   )
 }
 
-export default function Site({site, ohp}) {
+export default function Site({site, ohp, initialFilter = null}) {
   const [panel, setPanel] = useState('selects')
   const [hover, setHover] = useState('')
   const [view, setView] = useState(null) // {list: 'selects'|'ohp', p, i}
@@ -137,7 +137,7 @@ export default function Site({site, ohp}) {
   const pill = useRef(null)
   const [knob, setKnob] = useState({x: 0, w: 0})
   // The tag that's switched on (as a list of at most one); none means everything.
-  const [filters, setFilters] = useState([])
+  const [filters, setFilters] = useState(initialFilter ? [initialFilter] : [])
   // A shuffled project order (list of project keys), or null for the Studio's order.
   const [order, setOrder] = useState(null)
   const [shuffles, setShuffles] = useState(0)
@@ -162,9 +162,12 @@ export default function Site({site, ohp}) {
     : ordered
   const toggleFilter = (id) => {
     setView(null)
-    if (id === 'all') return setFilters([])
     // One tag at a time; clicking the active tag again turns it off.
-    setFilters((f) => (f.includes(id) ? [] : [id]))
+    const next = id === 'all' || filters.includes(id) ? [] : [id]
+    setFilters(next)
+    // Keep the address shareable: dev.pictures/bridal shows Bridal, dev.pictures shows everything.
+    const slug = site.categories.find((c) => c.id === next[0])?.slug
+    history.replaceState(null, '', (slug ? `/${slug}` : '/') + location.hash)
   }
   const shuffle = () => {
     setView(null)
