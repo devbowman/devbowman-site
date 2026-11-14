@@ -171,7 +171,7 @@ export default function Site({site, ohp, initialFilter = null}) {
   }
   const shuffleButton = (className) => (
     <button className={className} onClick={shuffle} aria-label="Shuffle the projects" title="Shuffle">
-      <svg key={shuffles} className={shuffles ? 'spun' : undefined} viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <svg key={shuffles} viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M2.5 7H6c2.6 0 3.9 2.2 5 5s2.4 5 5 5h4.5" />
         <path d="M2.5 17H6c1.5 0 2.5-.8 3.4-2.1" />
         <path d="M13.6 9.1C14.5 7.8 15.5 7 17 7h3.5" />
@@ -297,6 +297,10 @@ export default function Site({site, ohp, initialFilter = null}) {
   const next = current ? current.frames[(view.i + 1) % current.frames.length] : null
   const email = site.email || FALLBACK_EMAIL
   const links = site.links || []
+  // The address is filled in after the page loads, so it never sits in the page's HTML,
+  // where Cloudflare would replace it with "[email protected]" and spam bots could read it.
+  const [showEmail, setShowEmail] = useState(false)
+  useEffect(() => setShowEmail(true), [])
 
   const copy = async () => {
     try {
@@ -359,7 +363,7 @@ export default function Site({site, ohp, initialFilter = null}) {
                 <div className="contact">
                   <p className="m">Contact</p>
                   <div className="copyrow">
-                    <a href={`mailto:${email}`}>{email}</a>
+                    {showEmail ? <a href={`mailto:${email}`}>{email}</a> : <span aria-hidden="true">&nbsp;</span>}
                     <button onClick={copy}>{copied || 'Copy'}</button>
                   </div>
                 </div>
