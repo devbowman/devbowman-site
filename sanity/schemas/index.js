@@ -2,6 +2,7 @@ import {defineArrayMember, defineField, defineType} from 'sanity'
 import {FeatureInput} from '../components/FeatureInput'
 import {PhotoInput} from '../components/PhotoInput'
 import {ImagesWithBulkTags} from '../components/ImagesWithBulkTags'
+import {SelectsOrderInput} from '../components/SelectsOrderInput'
 
 export const project = defineType({
   name: 'project',
@@ -95,8 +96,9 @@ export const siteSettings = defineType({
       title: 'Selects order',
       type: 'array',
       description:
-        'Drag projects into the order they appear on Selects (top of the list = top of the page). Projects not added here show after these, newest first.',
-      of: [defineArrayMember({type: 'reference', to: [{type: 'project'}]})],
+        'Every published project appears here automatically (new ones at the top). Drag to reorder: top of the list = top of the page. Then Publish.',
+      components: {input: SelectsOrderInput},
+      of: [defineArrayMember({type: 'reference', to: [{type: 'project'}], weak: true})],
     }),
   ],
   preview: {prepare: () => ({title: 'Site settings'})},
