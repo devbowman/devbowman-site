@@ -141,7 +141,8 @@ img { max-width: 100%; }
 .site .filters button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
 .filters .tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 /* The shuffle button: a small round icon under the tags */
-.site .filters .shuffle { width: 30px; height: 30px; padding: 0; border-radius: 50%; display: grid; place-items: center; }
+.site .filters .shuffle { width: 32px; height: 32px; padding: 0; display: grid; place-items: center; background: none; box-shadow: none; color: var(--ink); transition: opacity 0.2s; }
+.site .filters .shuffle:hover { background: none; opacity: 0.6; }
 .site .filters .shuffle svg.spun { animation: shuffle-spin 0.45s var(--ease); }
 @keyframes shuffle-spin { from { transform: rotate(-180deg) scale(0.7); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .site .filters .shuffle svg { animation: none; } }

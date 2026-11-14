@@ -380,12 +380,12 @@ export default function Site({site, ohp}) {
                   ))}
                 </div>
                 <button className="shuffle" onClick={shuffle} aria-label="Shuffle the projects" title="Shuffle">
-                  <svg key={shuffles} className={shuffles ? "spun" : undefined} viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M16 3h5v5" />
-                    <path d="M4 20 21 3" />
-                    <path d="M21 16v5h-5" />
-                    <path d="M15 15l6 6" />
-                    <path d="M4 4l5 5" />
+                  <svg key={shuffles} className={shuffles ? 'spun' : undefined} viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M2.5 7H6c2.6 0 3.9 2.2 5 5s2.4 5 5 5h4.5" />
+                    <path d="M2.5 17H6c1.5 0 2.5-.8 3.4-2.1" />
+                    <path d="M13.6 9.1C14.5 7.8 15.5 7 17 7h3.5" />
+                    <path d="M18 4l3 3-3 3" />
+                    <path d="M18 14l3 3-3 3" />
                   </svg>
                 </button>
               </nav>
