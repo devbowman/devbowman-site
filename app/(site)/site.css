@@ -168,6 +168,7 @@ img { max-width: 100%; }
 .viewer.go-prev { cursor: w-resize; }
 .viewer.go-next { cursor: e-resize; }
 .viewer.go-close { cursor: zoom-out; }
+.viewer.go-link { cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .viewer .frame img { display: block; max-height: 100%; max-width: 100%; object-fit: contain; }
 .viewer .big { flex: 0 1 100%; }

@@ -278,11 +278,6 @@ export default function Site({site, ohp}) {
               <span>
                 {view.i + 1}/{current.frames.length}
               </span>
-              {current.link && (
-                <a href={current.link} target="_blank" rel="noopener">
-                  {view.list === 'ohp' ? 'Read on Substack ↗' : 'View ↗'}
-                </a>
-              )}
               <button onClick={() => setView(null)}>Close</button>
             </>
           ) : (
@@ -393,14 +388,18 @@ function Viewer({current, view, next, step, close}) {
   const touch = useRef(null)
   const img = useRef(null)
   // Above or below the photo closes; otherwise the left half goes back, the right half goes forward.
+  // Above or below the photo closes. On the photo: left side goes back, right side goes forward,
+  // and when the project has a link, the middle third of the photo opens it.
   const sideOf = (x, y) => {
     const r = img.current?.getBoundingClientRect()
     if (r && (y < r.top || y > r.bottom)) return 'close'
+    if (current.link && r && x > r.left + r.width / 3 && x < r.right - r.width / 3) return 'link'
     return x < window.innerWidth / 2 ? 'prev' : 'next'
   }
   const onClick = (e) => {
     const side = sideOf(e.clientX, e.clientY)
     if (side === 'close') close()
+    else if (side === 'link') window.open(current.link, '_blank', 'noopener')
     else step(side === 'prev' ? -1 : 1)
   }
   const onTouchStart = (e) => {
@@ -439,6 +438,11 @@ function Viewer({current, view, next, step, close}) {
       <button className="sr-only" onClick={(e) => (e.stopPropagation(), step(1))}>
         Next image
       </button>
+      {current.link && (
+        <a className="sr-only" href={current.link} target="_blank" rel="noopener" onClick={(e) => e.stopPropagation()}>
+          Open project link
+        </a>
+      )}
     </div>
   )
 }
