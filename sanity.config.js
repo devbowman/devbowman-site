@@ -6,6 +6,7 @@ import {visionTool} from '@sanity/vision'
 import {projectId, dataset, apiVersion} from './sanity/env'
 import {schemaTypes} from './sanity/schemas'
 import {structure} from './sanity/structure'
+import {OhpSyncLayout} from './sanity/components/OhpSyncLayout'
 
 export default defineConfig({
   name: 'default',
@@ -25,4 +26,5 @@ export default defineConfig({
         : actions,
   },
   plugins: [structureTool({structure}), visionTool({defaultApiVersion: apiVersion})],
+  studio: {components: {layout: OhpSyncLayout}},
 })

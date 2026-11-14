@@ -1,13 +1,18 @@
+import {createElement} from 'react'
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 import {FeatureInput} from '../components/FeatureInput'
 import {PhotoInput} from '../components/PhotoInput'
 import {ImagesWithBulkTags} from '../components/ImagesWithBulkTags'
+import {TaggedPhotos} from '../components/TaggedPhotos'
 
 export const project = defineType({
   name: 'project',
   title: 'Project',
   type: 'document',
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({type: 'project', newItemPosition: 'before'}),
     defineField({
       name: 'title',
       title: 'Title',
@@ -68,6 +73,14 @@ export const siteSettings = defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'portrait',
+      title: 'Portrait',
+      type: 'image',
+      description: 'Shown at the top of the "Dev Bowman" panel.',
+      options: {hotspot: true},
+      fields: [defineField({name: 'alt', title: 'Description (for screen readers)', type: 'string'})],
+    }),
+    defineField({
       name: 'bio',
       title: 'Bio',
       type: 'array',
@@ -75,6 +88,20 @@ export const siteSettings = defineType({
       of: [defineArrayMember({type: 'block', styles: [{title: 'Normal', value: 'normal'}], lists: []})],
     }),
     defineField({name: 'email', title: 'Contact email', type: 'string'}),
+    defineField({
+      name: 'favicon',
+      title: 'Favicon',
+      type: 'image',
+      description: 'The little icon in the browser tab. Use a square image, at least 512 × 512. Leave empty for the pink dot.',
+      options: {hotspot: true},
+    }),
+    defineField({
+      name: 'ohpIntro',
+      title: 'ONE HOUR PHOTO intro',
+      type: 'text',
+      rows: 2,
+      description: 'The line at the top of the ONE HOUR PHOTO tab. It links to your Substack.',
+    }),
     defineField({
       name: 'links',
       title: 'Links',
@@ -90,49 +117,71 @@ export const siteSettings = defineType({
         }),
       ],
     }),
-    defineField({
-      name: 'indexOrder',
-      title: 'Selects order',
-      type: 'array',
-      description:
-        'Drag projects into the order they appear on Selects (top of the list = top of the page). Projects not added here show after these, newest first.',
-      of: [defineArrayMember({type: 'reference', to: [{type: 'project'}]})],
-    }),
   ],
   preview: {prepare: () => ({title: 'Site settings'})},
 })
 
 export const ohpCover = defineType({
   name: 'ohpCover',
-  title: 'Feature cover',
+  title: 'ONE HOUR PHOTO feature',
   type: 'document',
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({type: 'ohpCover', newItemPosition: 'before'}),
+    defineField({name: 'postTitle', title: 'Post', type: 'string', readOnly: true, hidden: ({value}) => !value}),
     defineField({
       name: 'feature',
       title: 'Feature',
       type: 'string',
+      description: 'Filled in automatically for your latest 20 posts. Paste a link to pin an older one.',
       components: {input: FeatureInput},
+      hidden: ({document}) => !!document?.postTitle,
       validation: (r) => r.required(),
-    }),
-    defineField({
-      name: 'photo',
-      title: 'Cover photo',
-      type: 'number',
-      components: {input: PhotoInput},
-      initialValue: 1,
     }),
     defineField({
       name: 'name',
       title: 'Name on the site',
       type: 'string',
-      description: 'Optional. Replaces the name shown under the cover, e.g. "Nico Carney".',
+      description: 'Optional. Replaces the name shown under the cover, e.g. "Sarah Squirm".',
+    }),
+    defineField({
+      name: 'pinned',
+      title: 'Pin to the front',
+      type: 'boolean',
+      description:
+        'Pinned features always show first with a pin icon and stay even after they leave your latest 20 posts. Up to 5. Drag in the list to order them.',
+      initialValue: false,
+      validation: (r) =>
+        r.custom(async (value, ctx) => {
+          if (!value) return true
+          const id = String(ctx.document?._id || '').replace(/^drafts\./, '')
+          const others = await ctx
+            .getClient({apiVersion: '2025-10-01'})
+            .fetch('count(*[_type == "ohpCover" && pinned == true && !(_id in path("drafts.**")) && _id != $id])', {id})
+          return others >= 5 ? 'You can pin up to 5 features. Unpin one first.' : true
+        }),
+    }),
+    defineField({
+      name: 'photo',
+      title: 'Cover photo',
+      type: 'number',
+      description: 'Click any photo from the post to make it the cover.',
+      components: {input: PhotoInput},
+      initialValue: 1,
+    }),
+    defineField({
+      name: 'coverUrl',
+      title: 'Cover image link',
+      type: 'url',
+      description:
+        'Optional. Paste an image address (for example, right-click a photo on Substack → Copy Image Address). This wins over the photo picked above.',
     }),
     defineField({
       name: 'image',
       title: 'Upload a different cover',
       type: 'image',
       options: {hotspot: true},
-      description: 'Optional. Use an image that isn’t in the Substack post. This wins over the photo picked above.',
+      description: 'Optional. Upload an image that isn’t in the post. This wins over everything above.',
     }),
     defineField({
       name: 'hidden',
@@ -140,14 +189,36 @@ export const ohpCover = defineType({
       type: 'boolean',
       initialValue: false,
     }),
+    defineField({name: 'postDate', type: 'datetime', hidden: true, readOnly: true}),
+    defineField({name: 'thumb', type: 'url', hidden: true, readOnly: true}),
+    defineField({name: 'postInfo', type: 'string', hidden: true, readOnly: true}),
+    defineField({name: 'frames', type: 'array', of: [{type: 'string'}], hidden: true, readOnly: true}),
   ],
   preview: {
-    select: {feature: 'feature', name: 'name', hidden: 'hidden', photo: 'photo', media: 'image'},
-    prepare: ({feature, name, hidden, photo, media}) => ({
-      title: name || (feature || '').replace(/^.*\/p\//, '').replace(/-/g, ' ') || 'New cover',
-      subtitle: hidden ? 'Hidden' : media ? 'Custom upload' : `Photo ${photo || 1}`,
-      media,
-    }),
+    select: {
+      feature: 'feature',
+      postTitle: 'postTitle',
+      name: 'name',
+      hidden: 'hidden',
+      pinned: 'pinned',
+      thumb: 'thumb',
+      frames: 'frames',
+      photo: 'photo',
+      coverUrl: 'coverUrl',
+      image: 'image',
+    },
+    prepare: ({feature, postTitle, name, hidden, pinned, thumb, frames, photo, coverUrl, image}) => {
+      const src = coverUrl || (frames && frames[(photo || 1) - 1]) || thumb
+      return {
+        title: (pinned ? '📌 ' : '') + (name || postTitle || (feature || '').replace(/^.*\/p\//, '').replace(/-/g, ' ') || 'New feature'),
+        subtitle: [hidden ? 'Hidden' : null, name && postTitle ? postTitle : null].filter(Boolean).join(' · ') || undefined,
+        media:
+          image ||
+          (src
+            ? createElement('img', {src, alt: '', style: {width: '100%', height: '100%', objectFit: 'cover'}})
+            : undefined),
+      }
+    },
   },
 })
 
@@ -155,17 +226,20 @@ export const category = defineType({
   name: 'category',
   title: 'Tag',
   type: 'document',
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({type: 'category', newItemPosition: 'after'}),
     defineField({name: 'title', title: 'Name', type: 'string', validation: (r) => r.required()}),
     defineField({
-      name: 'order',
-      title: 'Position in the filter',
-      type: 'number',
-      description: 'Lower numbers come first.',
+      name: 'photos',
+      title: 'Photos with this tag',
+      type: 'string',
+      description: 'Select photos to take this tag off them. Changes go live right away.',
+      readOnly: true,
+      components: {input: TaggedPhotos},
     }),
   ],
-  orderings: [{title: 'Filter order', name: 'order', by: [{field: 'order', direction: 'asc'}]}],
-  preview: {select: {title: 'title', order: 'order'}, prepare: ({title, order}) => ({title, subtitle: order != null ? `Position ${order}` : undefined})},
+  preview: {select: {title: 'title'}},
 })
 
 export const schemaTypes = [project, siteSettings, ohpCover, category]

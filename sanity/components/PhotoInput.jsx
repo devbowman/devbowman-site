@@ -1,22 +1,21 @@
-import {Card, Grid, Stack, Text} from '@sanity/ui'
+import {Card, Stack, Text} from '@sanity/ui'
 import {set, useFormValue} from 'sanity'
-import {useFeatures, norm} from './useFeatures'
+import {useFeature} from './useFeatures'
 
 // Shows the chosen feature's portraits; click one to make it the cover. Stores its position (1 = first).
 export function PhotoInput({value, onChange, readOnly}) {
   const link = useFormValue(['feature'])
-  const {features} = useFeatures()
-  const feature = features?.find((f) => norm(f.link) === norm(link))
+  const {feature, loading, error} = useFeature(link)
   if (!link) return <Text size={1} muted>Choose a feature above first.</Text>
-  if (!features) return <Text size={1} muted>Loading photos…</Text>
-  if (!feature) return <Text size={1} muted>This feature isn't in the latest 20 posts, so its photos can't be shown.</Text>
+  if (loading) return <Text size={1} muted>Loading photos…</Text>
+  if (!feature) return <Text size={1} muted>{error || "Couldn't load this post's photos."}</Text>
   const chosen = value || 1
   return (
     <Stack space={3}>
       <Text size={1} muted>
         Click the photo to use as the cover. Selected: photo {chosen} of {feature.frames.length}.
       </Text>
-      <Grid columns={[3, 4, 5]} gap={2}>
+      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 8}}>
         {feature.frames.map((src, i) => {
           const on = chosen === i + 1
           return (
@@ -41,7 +40,7 @@ export function PhotoInput({value, onChange, readOnly}) {
             </Card>
           )
         })}
-      </Grid>
+      </div>
     </Stack>
   )
 }

@@ -4,3 +4,5 @@ out
 .env*.local
 .netlify
 .DS_Store
+/out
+.wrangler
